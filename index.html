@@ -22,7 +22,7 @@
   --term: #072219;
   --hole: #06180F;
   --focus: #F6D08B;
-  --display: "Chakra Petch", "Bahnschrift", "DIN Alternate", "Arial Narrow", sans-serif;
+  --display: "Chakra Petch", "Bahnschrift", "DIN Alternate", sans-serif;
   --body: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
   --mono: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
   color-scheme: dark;
@@ -57,7 +57,7 @@ body {
   background-color: var(--board);
   background-image: radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--silk) 9%, transparent) 1px, transparent 1.6px);
   background-size: 22px 22px;
-  color: var(--silk); font-family: var(--body); font-size: 16px; line-height: 1.55;
+  color: var(--silk); font-family: var(--body); font-size: var(--fs-base); line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
 button { font: inherit; color: inherit; }
@@ -67,15 +67,15 @@ code { font-family: var(--mono); font-size: .88em; background: color-mix(in srgb
 /* ---------- top bar ---------- */
 .bar {
   position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
-  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-  padding: 12px clamp(14px, 4vw, 28px);
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 12px clamp(16px, 4vw, 28px);
   background: color-mix(in srgb, var(--board-deep) 92%, transparent);
   backdrop-filter: blur(6px);
   border-bottom: 1px solid color-mix(in srgb, var(--silk) 14%, transparent);
 }
-.brand { font-family: var(--display); font-weight: 700; font-size: 20px; letter-spacing: .02em; margin-right: auto; display: flex; align-items: baseline; gap: 10px; }
-.brand small { font-family: var(--mono); font-weight: 400; font-size: 11px; color: var(--silk-dim); }
-.stats { display: flex; gap: 14px; font-family: var(--mono); font-size: 13px; color: var(--silk-dim); }
+.brand { font-family: var(--display); font-weight: 700; font-size: var(--fs-xl); letter-spacing: .02em; margin-right: auto; display: flex; align-items: baseline; gap: 12px; }
+.brand small { font-family: var(--mono); font-weight: 400; font-size: var(--fs-xs); color: var(--silk-dim); }
+.stats { display: flex; gap: 16px; font-family: var(--mono); font-size: var(--fs-sm); color: var(--silk-dim); }
 .stats b { color: var(--silk); font-weight: 600; }
 
 /* ---------- the stack ---------- */
@@ -94,7 +94,6 @@ main { max-width: 640px; margin: 0 auto; padding: 8px 16px 40px; overflow-x: cli
   box-shadow: 0 0 0 4px var(--board), 0 0 0 5.5px color-mix(in srgb, var(--copper-dim) 70%, transparent);
   transition: transform .15s ease;
 }
-.pad:hover { transform: scale(1.06); }
 .pad.done { background: radial-gradient(circle, var(--hole) 0 9px, var(--copper) 10px 100%); box-shadow: 0 0 0 4px var(--board), 0 0 0 5.5px var(--copper); }
 .pad.current { background: radial-gradient(circle, var(--hole) 0 9px, var(--tin) 10px 100%); box-shadow: 0 0 0 4px var(--board), 0 0 0 5.5px var(--tin); }
 .pad.current::after {
@@ -104,17 +103,17 @@ main { max-width: 640px; margin: 0 auto; padding: 8px 16px 40px; overflow-x: cli
 @keyframes probe { from { opacity: .9; transform: scale(.85); } to { opacity: 0; transform: scale(1.25); } }
 .pad-label {
   position: absolute; top: 50%; transform: translateY(-50%); width: max-content; max-width: min(38vw, 200px);
-  font-family: var(--display); font-weight: 600; font-size: 15px; line-height: 1.2; text-align: left;
+  font-family: var(--display); font-weight: 600; font-size: var(--fs-base); line-height: 1.2; text-align: left;
 }
-.pad-label span { display: block; font-family: var(--mono); font-weight: 400; font-size: 11px; color: var(--silk-dim); }
+.pad-label span { display: block; font-family: var(--mono); font-weight: 400; font-size: var(--fs-xs); color: var(--silk-dim); }
 .pad-label.right { left: calc(100% + 16px); }
 .pad-label.left { right: calc(100% + 16px); text-align: right; }
 
 .chip {
-  width: min(78vw, 300px); min-height: 74px; padding: 12px 18px;
+  width: min(78vw, 300px); min-height: 74px; padding: 12px 20px;
   background: var(--board-deep); color: var(--silk);
   border: 1.5px solid color-mix(in srgb, var(--silk) 30%, transparent); border-radius: 4px;
-  display: grid; grid-template-columns: auto 1fr; gap: 2px 14px; align-items: center;
+  display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; align-items: center;
 }
 .chip::before, .chip::after {
   content: ""; position: absolute; top: 12px; bottom: 12px; width: 9px;
@@ -122,22 +121,22 @@ main { max-width: 640px; margin: 0 auto; padding: 8px 16px 40px; overflow-x: cli
 }
 .chip::before { left: -10px; }
 .chip::after { right: -10px; }
-.chip .ref { grid-row: span 2; font-family: var(--mono); font-size: 13px; color: var(--copper); border-right: 1px solid color-mix(in srgb, var(--silk) 22%, transparent); padding-right: 14px; align-self: stretch; display: grid; place-items: center; }
-.chip h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 18px; line-height: 1.2; }
-.chip p { margin: 0; font-family: var(--mono); font-size: 11px; color: var(--silk-dim); }
+.chip .ref { grid-row: span 2; font-family: var(--mono); font-size: var(--fs-sm); color: var(--copper); border-right: 1px solid color-mix(in srgb, var(--silk) 22%, transparent); padding-right: 16px; align-self: stretch; display: grid; place-items: center; }
+.chip h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: var(--fs-lg); line-height: 1.2; }
+.chip p { margin: 0; font-family: var(--mono); font-size: var(--fs-xs); color: var(--silk-dim); }
 .chip .notch { position: absolute; left: 50%; top: -1px; width: 22px; height: 11px; transform: translateX(-50%); border: 1.5px solid color-mix(in srgb, var(--silk) 30%, transparent); border-top: 0; border-radius: 0 0 11px 11px; background: var(--board); }
 
 .jack {
-  display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
 }
 .jack .plug { width: 70px; height: 34px; border-radius: 4px; background: var(--tin); position: relative; }
 .jack .plug::before { content: ""; position: absolute; left: 12px; right: 12px; top: 9px; height: 16px; border-radius: 3px; background: var(--hole); }
-.jack strong { font-family: var(--display); font-weight: 700; font-size: 22px; }
-.jack em { font-style: normal; font-size: 14px; color: var(--silk-dim); max-width: 34ch; }
-.cap { font-family: var(--mono); font-size: 12px; color: var(--silk-dim); text-align: center; }
+.jack strong { font-family: var(--display); font-weight: 700; font-size: var(--fs-2xl); }
+.jack em { font-style: normal; font-size: var(--fs-sm); color: var(--silk-dim); max-width: 34ch; }
+.cap { font-family: var(--mono); font-size: var(--fs-xs); color: var(--silk-dim); text-align: center; }
 
-footer { max-width: 640px; margin: 0 auto; padding: 0 16px 48px; font-size: 13px; color: var(--silk-dim); }
-footer details { border-top: 1px solid color-mix(in srgb, var(--silk) 14%, transparent); padding-top: 14px; }
+footer { max-width: 640px; margin: 0 auto; padding: 0 16px 48px; font-size: var(--fs-sm); color: var(--silk-dim); }
+footer details { border-top: 1px solid color-mix(in srgb, var(--silk) 14%, transparent); padding-top: 16px; }
 footer summary { cursor: pointer; font-family: var(--display); font-weight: 600; color: var(--silk); }
 footer p { max-width: 62ch; }
 .linkish { background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; color: var(--silk); }
@@ -152,31 +151,31 @@ footer p { max-width: 62ch; }
   flex-direction: column;
 }
 .player.open { display: flex; }
-.p-head { display: flex; align-items: center; gap: 14px; padding: 12px clamp(14px, 4vw, 28px); max-width: 820px; width: 100%; margin: 0 auto; }
-.close { width: 36px; height: 36px; border-radius: 6px; border: 1.5px solid var(--silk-dim); background: none; cursor: pointer; font-size: 18px; line-height: 1; }
-.leds { flex: 1; display: flex; gap: 5px; }
+.p-head { display: flex; align-items: center; gap: 16px; padding: 12px clamp(16px, 4vw, 28px); max-width: 820px; width: 100%; margin: 0 auto; }
+.close { width: 36px; height: 36px; border-radius: 6px; border: 1.5px solid var(--silk-dim); background: none; cursor: pointer; font-size: var(--fs-lg); line-height: 1; }
+.leds { flex: 1; display: flex; gap: 4px; }
 .leds i { flex: 1; height: 10px; border-radius: 2px; background: var(--copper-dim); }
 .leds i.on { background: var(--copper); }
 .leds i.here { background: var(--tin); }
-.p-xp { font-family: var(--mono); font-size: 13px; color: var(--silk-dim); white-space: nowrap; }
-.p-body { flex: 1; overflow-y: auto; padding: 8px clamp(14px, 4vw, 28px) 28px; }
+.p-xp { font-family: var(--mono); font-size: var(--fs-sm); color: var(--silk-dim); white-space: nowrap; }
+.p-body { flex: 1; overflow-y: auto; padding: 8px clamp(16px, 4vw, 28px) 28px; }
 .p-inner { max-width: 760px; margin: 0 auto; }
-.kicker { font-family: var(--mono); font-size: 12px; color: var(--copper); margin: 8px 0 6px; }
-.p-inner h1 { font-family: var(--display); font-weight: 700; font-size: clamp(24px, 4.5vw, 32px); line-height: 1.15; margin: 0 0 14px; }
+.kicker { font-family: var(--mono); font-size: var(--fs-xs); color: var(--copper); margin: 8px 0 8px; }
+.p-inner h1 { font-family: var(--display); font-weight: 700; font-size: clamp(var(--fs-2xl), 4.5vw, var(--fs-3xl)); line-height: 1.15; margin: 0 0 16px; }
 .prose p { margin: 0 0 12px; max-width: 66ch; }
-.prompt { font-size: 18px; margin: 0 0 16px; max-width: 64ch; }
+.prompt { font-size: var(--fs-lg); margin: 0 0 16px; max-width: 64ch; }
 pre.sample {
-  margin: 16px 0; padding: 14px 16px; background: var(--term); border-radius: 6px;
+  margin: 16px 0; padding: 16px 16px; background: var(--term); border-radius: 6px;
   border-left: 3px solid var(--copper); overflow-x: auto;
-  font-family: var(--mono); font-size: 14px; line-height: 1.6;
+  font-family: var(--mono); font-size: var(--fs-sm); line-height: 1.6;
 }
-.opts { display: grid; gap: 10px; margin: 8px 0 0; }
+.opts { display: grid; gap: 12px; margin: 8px 0 0; }
 .opt {
-  text-align: left; padding: 13px 16px; border-radius: 6px; cursor: pointer;
+  text-align: left; padding: 12px 16px; border-radius: 6px; cursor: pointer;
   background: var(--board-raise); border: 1.5px solid color-mix(in srgb, var(--silk) 20%, transparent);
-  font-size: 16px; display: flex; gap: 12px; align-items: baseline;
+  font-size: var(--fs-base); display: flex; gap: 12px; align-items: baseline;
 }
-.opt kbd { font-family: var(--mono); font-size: 12px; color: var(--silk-dim); min-width: 1.2em; }
+.opt kbd { font-family: var(--mono); font-size: var(--fs-xs); color: var(--silk-dim); min-width: 1.2em; }
 .opt[aria-checked="true"] { border-color: var(--copper); box-shadow: inset 0 0 0 1px var(--copper); }
 .opt.right { border-color: var(--copper); background: color-mix(in srgb, var(--copper) 18%, var(--board-raise)); }
 .opt.wrong { border-color: var(--wrong); }
@@ -184,57 +183,141 @@ pre.sample {
 .opt code { font-size: .85em; }
 
 .editor { border-radius: 6px; overflow: hidden; border: 1.5px solid color-mix(in srgb, var(--silk) 22%, transparent); background: var(--term); }
-.ed-bar { display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 14px; border-bottom: 1px solid color-mix(in srgb, var(--silk) 14%, transparent); font-family: var(--mono); font-size: 12px; color: var(--silk-dim); }
+.ed-bar { display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 16px; border-bottom: 1px solid color-mix(in srgb, var(--silk) 14%, transparent); font-family: var(--mono); font-size: var(--fs-xs); color: var(--silk-dim); }
 .ed-bar .sp { margin-right: auto; }
 .ed-wrap { display: grid; grid-template-columns: auto 1fr; max-height: 52vh; overflow: auto; }
-.gutter { margin: 0; padding: 12px 10px 12px 12px; text-align: right; color: color-mix(in srgb, var(--silk) 38%, transparent); font-family: var(--mono); font-size: 14px; line-height: 1.6; user-select: none; white-space: pre; }
+.gutter { margin: 0; padding: 12px 12px 12px 12px; text-align: right; color: color-mix(in srgb, var(--silk) 38%, transparent); font-family: var(--mono); font-size: var(--fs-sm); line-height: 1.6; user-select: none; white-space: pre; }
 .ed-wrap textarea {
   width: 100%; min-height: 220px; resize: none; border: 0; outline: none; background: transparent; color: var(--silk);
-  font-family: var(--mono); font-size: 14px; line-height: 1.6; padding: 12px 14px 12px 4px; white-space: pre; overflow: hidden; tab-size: 4;
+  font-family: var(--mono); font-size: var(--fs-sm); line-height: 1.6; padding: 12px 16px 12px 4px; white-space: pre; overflow: hidden; tab-size: 4;
 }
 .ed-wrap textarea:focus-visible { outline: none; }
 .editor:focus-within { border-color: var(--copper); }
 .btn {
-  border-radius: 6px; padding: 9px 16px; cursor: pointer; font-family: var(--display); font-weight: 600; font-size: 15px;
+  border-radius: 6px; padding: 8px 16px; cursor: pointer; font-family: var(--display); font-weight: 600; font-size: var(--fs-base);
   background: none; border: 1.5px solid var(--silk-dim);
 }
-.btn.small { padding: 4px 11px; font-size: 13px; }
+.btn.small { padding: 4px 12px; font-size: var(--fs-sm); }
 .btn.primary { background: var(--copper); border-color: var(--copper); color: var(--on-copper); }
 .btn:disabled { opacity: .5; cursor: default; }
-.tools { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0 0; }
-.hint { margin: 12px 0 0; padding: 10px 14px; border-left: 3px solid var(--tin); background: color-mix(in srgb, var(--tin) 10%, transparent); font-family: var(--mono); font-size: 13px; white-space: pre-wrap; }
+.tools { display: flex; gap: 12px; flex-wrap: wrap; margin: 12px 0 0; }
+.hint { margin: 12px 0 0; padding: 12px 16px; border-left: 3px solid var(--tin); background: color-mix(in srgb, var(--tin) 10%, transparent); font-size: var(--fs-sm); }
+.hint code { white-space: pre-wrap; }
 .term { margin: 12px 0 0; border-radius: 6px; background: var(--term); border: 1px solid color-mix(in srgb, var(--silk) 14%, transparent); }
-.term-h { font-family: var(--mono); font-size: 11px; color: var(--silk-dim); padding: 6px 12px; border-bottom: 1px solid color-mix(in srgb, var(--silk) 10%, transparent); display: flex; justify-content: space-between; }
-.term pre { margin: 0; padding: 10px 12px; font-family: var(--mono); font-size: 13px; line-height: 1.55; white-space: pre-wrap; word-break: break-word; min-height: 2.8em; }
+.term-h { font-family: var(--mono); font-size: var(--fs-xs); color: var(--silk-dim); padding: 8px 12px; border-bottom: 1px solid color-mix(in srgb, var(--silk) 10%, transparent); display: flex; justify-content: space-between; }
+.term pre { margin: 0; padding: 12px 12px; font-family: var(--mono); font-size: var(--fs-sm); line-height: 1.55; white-space: pre-wrap; word-break: break-word; min-height: 2.8em; }
 .term pre.err { color: var(--wrong); }
 .term .muted { color: var(--silk-dim); }
-.diff { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-.diff pre { margin: 4px 0 0; padding: 8px 10px; background: var(--term); border-radius: 4px; font-family: var(--mono); font-size: 12.5px; white-space: pre-wrap; }
-.diff span { font-family: var(--mono); font-size: 11px; color: var(--silk-dim); }
+.diff { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.diff pre { margin: 4px 0 0; padding: 8px 12px; background: var(--term); border-radius: 4px; font-family: var(--mono); font-size: var(--fs-xs); white-space: pre-wrap; }
+.diff span { font-family: var(--mono); font-size: var(--fs-xs); color: var(--silk-dim); }
 
 .p-foot { border-top: 1px solid color-mix(in srgb, var(--silk) 14%, transparent); background: var(--board-deep); padding-bottom: env(safe-area-inset-bottom, 0px); }
 .p-foot.ok { background: color-mix(in srgb, var(--copper) 22%, var(--board-deep)); }
 .p-foot.bad { background: color-mix(in srgb, var(--wrong) 18%, var(--board-deep)); }
-.p-foot-in { max-width: 760px; margin: 0 auto; padding: 14px clamp(14px, 4vw, 28px); display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.p-foot-in { max-width: 760px; margin: 0 auto; padding: 16px clamp(16px, 4vw, 28px); display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
 .verdict { flex: 1 1 260px; }
-.verdict strong { font-family: var(--display); font-weight: 700; font-size: 19px; display: block; }
-.verdict div { font-size: 14.5px; max-width: 60ch; }
-.p-foot .btn.primary { min-width: 150px; padding: 12px 22px; font-size: 16px; }
+.verdict strong { font-family: var(--display); font-weight: 700; font-size: var(--fs-lg); display: block; }
+.verdict div { font-size: var(--fs-sm); max-width: 60ch; }
+.p-foot .btn.primary { min-width: 150px; padding: 12px 24px; font-size: var(--fs-base); }
 .celebrate { text-align: center; padding-top: 8vh; }
-.celebrate .big { font-family: var(--display); font-weight: 700; font-size: clamp(34px, 7vw, 52px); line-height: 1.05; margin: 14px 0 22px; }
+.celebrate .big { font-family: var(--display); font-weight: 700; font-size: clamp(var(--fs-4xl), 7vw, var(--fs-5xl)); line-height: 1.05; margin: 16px 0 24px; }
 .meter { display: inline-grid; grid-template-columns: repeat(2, minmax(120px, auto)); gap: 12px; }
-.meter div { border: 1.5px solid color-mix(in srgb, var(--silk) 22%, transparent); border-radius: 6px; padding: 12px 18px; }
-.meter b { display: block; font-family: var(--display); font-size: 28px; color: var(--copper); }
-.meter span { font-family: var(--mono); font-size: 12px; color: var(--silk-dim); }
+.meter div { border: 1.5px solid color-mix(in srgb, var(--silk) 22%, transparent); border-radius: 6px; padding: 12px 20px; }
+.meter b { display: block; font-family: var(--display); font-size: var(--fs-3xl); color: var(--copper); }
+.meter span { font-family: var(--mono); font-size: var(--fs-xs); color: var(--silk-dim); }
 
 @media (max-width: 520px) {
   .stats { width: 100%; justify-content: space-between; order: 3; }
-  .pad-label { font-size: 14px; }
+  .pad-label { font-size: var(--fs-sm); }
   .diff { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {
   .pad.current::after { animation: none; opacity: .6; }
   .pad { transition: none; }
+}
+
+/* ---------- design-system layer ---------- */
+:root {
+  --fs-xs: 12px; --fs-sm: 14px; --fs-base: 16px; --fs-lg: 18px; --fs-xl: 20px;
+  --fs-2xl: 24px; --fs-3xl: 30px; --fs-4xl: 36px; --fs-5xl: 48px;
+  --ok: #7FDCA6; --warn: #F2C14E;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --lift: 0 1px 2px rgba(0, 0, 0, 0.10), 0 4px 12px rgba(0, 0, 0, 0.16), 0 16px 32px rgba(0, 0, 0, 0.10);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) { --ok: #1D7447; --warn: #8A5A00;
+    --lift: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.08), 0 16px 32px rgba(0, 0, 0, 0.04); }
+}
+:root[data-theme="light"] { --ok: #1D7447; --warn: #8A5A00;
+  --lift: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.08), 0 16px 32px rgba(0, 0, 0, 0.04); }
+:root[data-theme="dark"] { --ok: #7FDCA6; --warn: #F2C14E;
+  --lift: 0 1px 2px rgba(0, 0, 0, 0.10), 0 4px 12px rgba(0, 0, 0, 0.16), 0 16px 32px rgba(0, 0, 0, 0.10); }
+
+/* hierarchy */
+.brand, .chip h2, .jack strong { letter-spacing: -0.01em; line-height: 1.2; }
+.p-inner h1 { letter-spacing: -0.02em; line-height: 1.15; }
+.celebrate .big { letter-spacing: -0.03em; line-height: 1.1; }
+
+/* depth for floating surfaces */
+.bar { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: var(--lift); }
+.p-foot { box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.06), 0 -8px 24px rgba(0, 0, 0, 0.12); }
+
+/* semantic feedback, kept separate from the copper accent */
+.p-foot { border-left: 0; }
+.p-foot.ok { background: color-mix(in srgb, var(--ok) 14%, var(--board-deep)); box-shadow: inset 0 3px 0 var(--ok), 0 -8px 24px rgba(0, 0, 0, 0.12); }
+.p-foot.bad { background: color-mix(in srgb, var(--wrong) 14%, var(--board-deep)); box-shadow: inset 0 3px 0 var(--wrong), 0 -8px 24px rgba(0, 0, 0, 0.12); }
+.p-foot.warn { background: color-mix(in srgb, var(--warn) 14%, var(--board-deep)); box-shadow: inset 0 3px 0 var(--warn), 0 -8px 24px rgba(0, 0, 0, 0.12); }
+.p-foot.ok .verdict strong { color: var(--ok); }
+.p-foot.bad .verdict strong { color: var(--wrong); }
+.p-foot.warn .verdict strong { color: var(--warn); }
+.opt.right { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, var(--board-raise)); box-shadow: none; }
+.term pre.warn { color: var(--warn); }
+
+/* radius harmony: controls inside the 6px editor bar step down */
+.btn.small { border-radius: 4px; }
+
+/* interactive states */
+.btn, .opt, .close, .linkish {
+  transition: background-color 0.2s var(--ease), transform 0.2s var(--ease), border-color 0.2s var(--ease), filter 0.2s var(--ease);
+}
+.btn { display: inline-flex; align-items: center; gap: 8px; }
+.btn svg, .close svg { width: 16px; height: 16px; flex: none; }
+.btn:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-2px); border-color: var(--silk); }
+.btn.primary:hover:not(:disabled) { border-color: var(--copper); }
+.btn:active:not(:disabled) { transform: scale(0.98); }
+.btn:disabled, .opt:disabled { opacity: 0.5; cursor: not-allowed; }
+.opt:hover:not(:disabled) { border-color: var(--silk-dim); background: color-mix(in srgb, var(--silk) 6%, var(--board-raise)); }
+.opt:active:not(:disabled) { transform: scale(0.98); }
+.opt.right:disabled, .opt.wrong:disabled { opacity: 1; }
+.close { display: grid; place-items: center; }
+.close:hover { border-color: var(--silk); background: color-mix(in srgb, var(--silk) 8%, transparent); }
+.close:active { transform: scale(0.96); }
+.linkish:hover { color: var(--copper); }
+.pad { transition: transform 0.2s var(--ease), filter 0.2s var(--ease); }
+.pad:hover { filter: brightness(1.1); }
+.pad:active { transform: translate(-50%, -50%) scale(0.96); }
+.pad:hover { transform: translate(-50%, -50%) scale(1.06); }
+
+/* pills */
+.pad-label span {
+  display: inline-block; margin-top: 4px; padding: 2px 8px; border-radius: 999px;
+  font-size: var(--fs-xs); line-height: 1.4; color: var(--silk-dim);
+  background: color-mix(in srgb, var(--silk) 8%, transparent);
+}
+.pad-label span.is-done { color: var(--copper); background: color-mix(in srgb, var(--copper) 16%, transparent); }
+.pad-label span.is-next { color: var(--board); background: var(--tin); font-weight: 600; }
+.stats span { padding: 4px 12px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--silk) 16%, transparent); }
+
+/* loading skeleton for the output panel */
+.skel { display: grid; gap: 8px; padding: 12px; }
+.skel i { display: block; height: 12px; border-radius: 4px; background: color-mix(in srgb, var(--silk) 10%, transparent); animation: pulse 1.2s var(--ease) infinite; }
+.skel i:nth-child(1) { width: 62%; } .skel i:nth-child(2) { width: 40%; } .skel i:nth-child(3) { width: 52%; }
+@keyframes pulse { 50% { opacity: 0.45; } }
+@media (prefers-reduced-motion: reduce) {
+  .skel i { animation: none; }
+  .btn, .opt, .close, .pad { transition: none; }
+  .btn:hover:not(:disabled) { transform: none; }
 }
 </style>
 </head>
@@ -255,14 +338,14 @@ pre.sample {
 <footer>
   <details>
     <summary>How the code runs</summary>
-    <p>C runs through PicoC, a small C interpreter compiled to WebAssembly, inside your browser. It covers everything these lessons need, but it is not gcc: <code>const</code>, struct initializer lists like <code>{3, 4}</code>, function pointers, and arithmetic directly on an array name are not supported. Real compilers accept all of them.</p>
+    <p>Your code runs in your browser through PicoC, a small C interpreter compiled to WebAssembly. It covers everything these lessons need, but it is not a full C compiler: it does not support <code>const</code>, struct initializer lists such as <code>{3, 4}</code>, function pointers, or arithmetic directly on an array name. A real compiler such as gcc accepts all of them.</p>
     <p>Progress is saved in this browser only. <button class="linkish" id="reset" type="button">Reset progress</button></p>
   </details>
 </footer>
 
 <section class="player" id="player" role="dialog" aria-modal="true" aria-labelledby="p-title">
   <div class="p-head">
-    <button class="close" id="p-close" type="button" aria-label="Close lesson">&#x2715;</button>
+    <button class="close" id="p-close" type="button" aria-label="Close lesson"></button>
     <div class="leds" id="p-leds" aria-hidden="true"></div>
     <div class="p-xp" id="p-xp">+0 xp</div>
   </div>
@@ -282,7 +365,7 @@ const R = String.raw;
 const TRACKS = {
   c: {
     name: 'C',
-    blurb: 'Pointers, structs and the heap, in the order you will need them.',
+    blurb: 'From printf to pointers, structs and the heap, in the order Pintos will ask for them.',
     units: [
       {
         title: 'Output and types',
@@ -291,7 +374,7 @@ const TRACKS = {
             id: 'c1-1', title: 'Hello, printf',
             steps: [
               { type: 'learn', title: 'Anatomy of a C program',
-                body: R`<p>Every C program starts running at <code>main</code>. Lines beginning with <code>#include</code> pull in declarations from a header, and <code>stdio.h</code> is where <code>printf</code> lives.</p><p><code>return 0;</code> hands an exit status back to whoever launched the program. Zero means success.</p>`,
+                body: R`<p>Every C program starts running at <code>main</code>. Lines beginning with <code>#include</code> paste in a header's declarations. <code>stdio.h</code> declares <code>printf</code>; the function itself lives in the C library, which the linker adds.</p><p><code>return 0;</code> from <code>main</code> hands an exit status back to whoever launched the program. Zero means success.</p>`,
                 code: R`#include <stdio.h>
 
 int main(void)
@@ -299,11 +382,11 @@ int main(void)
     printf("Hello, world!\n");
     return 0;
 }` },
-              { type: 'mcq', prompt: 'What does the \\n at the end of the string do?',
+              { type: 'mcq', prompt: 'What does the <code>\\n</code> at the end of the string do?',
                 options: ['Ends the program', 'Starts a new line of output', 'Prints the letter n', 'Marks the end of the string in memory'],
                 answer: 1,
-                explain: R`<code>\n</code> is an escape sequence for the newline character. The end of a string in memory is marked by <code>\0</code>, which the compiler adds for you.` },
-              { type: 'code', prompt: 'Change the program so it prints exactly <code>Hello, Pintos!</code> followed by a newline.',
+                explain: R`<code>\n</code> is the escape sequence for a newline character. The end of a string in memory is marked by a zero byte, <code>'\0'</code>, which the compiler adds to string literals for you.` },
+              { type: 'code', prompt: 'Change the program so it prints <code>Hello, Pintos!</code> followed by a newline. Expected output: <code>Hello, Pintos!</code>',
                 starter: R`#include <stdio.h>
 
 int main(void)
@@ -326,15 +409,15 @@ int main(void)
             id: 'c1-2', title: 'Variables and types',
             steps: [
               { type: 'learn', title: 'Every variable has a type',
-                body: R`<p>C needs to know how many bytes a variable takes and how to interpret them. The common starters: <code>int</code> for whole numbers, <code>char</code> for a single byte, <code>double</code> for floating point.</p><p>Dividing two <code>int</code>s gives an <code>int</code>. The fraction is thrown away, not rounded. <code>%</code> gives the remainder.</p>`,
+                body: R`<p>C needs to know how many bytes a variable occupies and how to interpret them. The common starters are <code>int</code> for whole numbers, <code>char</code> for a single byte, and <code>double</code> for floating point.</p><p>Dividing two <code>int</code>s gives an <code>int</code>: the fraction is discarded, truncating toward zero, so <code>-7 / 2</code> is <code>-3</code>. <code>%</code> gives the remainder.</p>`,
                 code: R`int count = 10;
 char grade = 'A';
 double ratio = 7.0 / 2;   /* 3.5 */
 int half = 7 / 2;         /* 3, not 3.5 */` },
               { type: 'mcq', prompt: 'What does this print?', code: R`printf("%d\n", 9 / 4);`,
-                options: ['2.25', '2', '3', '9/4'], answer: 1,
-                explain: 'Both operands are int, so this is integer division. 9 / 4 is 2 with the .25 truncated.' },
-              { type: 'code', prompt: 'Declare <code>int a = 17</code> and <code>int b = 5</code>, then print the quotient and the remainder separated by a space. Expected output: <code>3 2</code>',
+                options: ['<code>2.25</code>', '<code>2</code>', '<code>3</code>', '<code>9/4</code>'], answer: 1,
+                explain: R`Both operands are <code>int</code>, so this is integer division. <code>9 / 4</code> is 2; the .25 is discarded.` },
+              { type: 'code', prompt: 'Declare <code>int a = 17</code> and <code>int b = 5</code>, then print the quotient and the remainder, separated by a space. Expected output: <code>3 2</code>',
                 starter: R`#include <stdio.h>
 
 int main(void)
@@ -344,7 +427,7 @@ int main(void)
 }`,
                 expected: '3 2\n',
                 requires: [{ re: R`/`, msg: 'Use the / operator.' }, { re: R`%\s*b|%\s*5`, msg: 'Use the % operator for the remainder.' }],
-                hint: R`printf("%d %d\n", a / b, a % b);`,
+                hint: R`<code>printf("%d %d\n", a / b, a % b);</code>`,
                 solution: R`#include <stdio.h>
 
 int main(void)
@@ -360,14 +443,14 @@ int main(void)
             id: 'c1-3', title: 'Format specifiers',
             steps: [
               { type: 'learn', title: 'Telling printf how to read bytes',
-                body: R`<p><code>printf</code> does not know your variable types. The format string tells it. A mismatch compiles fine and prints garbage, which is why these are worth memorizing.</p><p><code>%d</code> int, <code>%c</code> char, <code>%f</code> double, <code>%s</code> string, <code>%x</code> hex, <code>%lu</code> for the result of <code>sizeof</code>.</p>`,
+                body: R`<p><code>printf</code> cannot see your variables' types; the format string tells it how to read each argument. A mismatch is undefined behavior. Compilers catch most of them if you build with <code>-Wall</code>, so read the warnings.</p><p>The ones to know: <code>%d</code> for <code>int</code>, <code>%c</code> for <code>char</code>, <code>%f</code> for <code>double</code>, <code>%s</code> for a string, <code>%x</code> for an <code>unsigned int</code> in hex, and <code>%zu</code> for a <code>size_t</code>, the type <code>sizeof</code> returns.</p>`,
                 code: R`char c = 'A';
 printf("%c %d\n", c, c);     /* A 65 */
 printf("%x\n", 255);         /* ff */
-printf("%lu\n", sizeof(int)); /* 4 */` },
+printf("%zu\n", sizeof(int)); /* 4 on most systems */` },
               { type: 'mcq', prompt: 'A char is just a small integer. What does this print?', code: R`printf("%c\n", 'A' + 2);`,
-                options: ['A2', 'C', '67', 'B'], answer: 1,
-                explain: R`'A' is 65. Adding 2 gives 67, and <code>%c</code> prints the character with that code, which is C.` },
+                options: ['<code>A2</code>', '<code>C</code>', '<code>67</code>', '<code>B</code>'], answer: 1,
+                explain: R`In ASCII, <code>'A'</code> is 65. Adding 2 gives 67, and <code>%c</code> prints the character with that code: C.` },
               { type: 'code', prompt: 'Store the character <code>Z</code> in a <code>char</code>, then print its numeric code and the character itself. Expected output: <code>90 Z</code>',
                 starter: R`#include <stdio.h>
 
@@ -379,7 +462,7 @@ int main(void)
 }`,
                 expected: '90 Z\n',
                 requires: [{ re: R`%d`, msg: 'Use %d for the number.' }, { re: R`%c`, msg: 'Use %c for the character.' }],
-                hint: 'Pass the same variable twice with two different specifiers.',
+                hint: 'Pass the same variable twice, with two different specifiers.',
                 solution: R`#include <stdio.h>
 
 int main(void)
@@ -399,7 +482,7 @@ int main(void)
             id: 'c2-1', title: 'if and else',
             steps: [
               { type: 'learn', title: 'Branching',
-                body: R`<p>C has no boolean type by default. Any nonzero value counts as true and zero counts as false.</p><p>The classic trap: <code>=</code> assigns, <code>==</code> compares. <code>if (x = 0)</code> sets x to zero and is always false.</p>`,
+                body: R`<p>A condition in C is just a number: zero is false and anything else is true. C99 added <code>bool</code> through <code>&lt;stdbool.h&gt;</code>, but the rule underneath is the same.</p><p>The classic trap: <code>=</code> assigns, <code>==</code> compares. <code>if (x = 0)</code> sets x to zero and is always false.</p>`,
                 code: R`if (n > 0) {
     printf("positive\n");
 } else if (n == 0) {
@@ -407,13 +490,13 @@ int main(void)
 } else {
     printf("negative\n");
 }` },
-              { type: 'mcq', prompt: 'x is 5. What does this print?', code: R`if (x = 0)
+              { type: 'mcq', prompt: '<code>x</code> is 5. What does this print?', code: R`if (x = 0)
     printf("zero\n");
 else
     printf("nonzero\n");`,
-                options: ['zero', 'nonzero', 'Nothing, it will not compile', '5'], answer: 1,
+                options: ['<code>zero</code>', '<code>nonzero</code>', 'Nothing; it will not compile', '<code>5</code>'], answer: 1,
                 explain: R`<code>x = 0</code> assigns 0 and the whole expression evaluates to 0, which is false. So the else branch runs, and x is now 0 as a side effect.` },
-              { type: 'code', prompt: 'Using <code>if</code> and the <code>%</code> operator, print <code>even</code> or <code>odd</code> for <code>n</code>. With n = 42 the output is <code>even</code>.',
+              { type: 'code', prompt: 'Using <code>if</code> and the <code>%</code> operator, print <code>even</code> or <code>odd</code> depending on <code>n</code>. Expected output: <code>even</code>',
                 starter: R`#include <stdio.h>
 
 int main(void)
@@ -424,7 +507,7 @@ int main(void)
 }`,
                 expected: 'even\n',
                 requires: [{ re: R`if\s*\(`, msg: 'Use an if statement.' }, { re: R`%\s*2`, msg: 'Check the remainder with % 2.' }],
-                hint: R`if (n % 2 == 0) { ... } else { ... }`,
+                hint: R`<code>if (n % 2 == 0) { ... } else { ... }</code>`,
                 solution: R`#include <stdio.h>
 
 int main(void)
@@ -442,7 +525,7 @@ int main(void)
             id: 'c2-2', title: 'Loops',
             steps: [
               { type: 'learn', title: 'for and while',
-                body: R`<p>A <code>for</code> loop packs setup, test and update onto one line. A <code>while</code> loop only has the test. They are interchangeable, so pick whichever reads better.</p><p>Off-by-one errors live in the test. <code>i &lt; n</code> runs n times starting from 0. <code>i &lt;= n</code> runs n + 1 times.</p>`,
+                body: R`<p>A <code>for</code> loop puts setup, test, and update on one line. A <code>while</code> loop has only the test. Either can express the other, so pick whichever reads better.</p><p>Off-by-one errors live in the test. Starting from 0, <code>i &lt; n</code> runs n times and <code>i &lt;= n</code> runs n + 1 times.</p>`,
                 code: R`for (int i = 0; i < 3; i++)
     printf("%d ", i);      /* 0 1 2 */
 
@@ -451,7 +534,7 @@ while (j > 0)
     j--;` },
               { type: 'mcq', prompt: 'How many times does the body run?', code: R`for (int i = 0; i <= 5; i++) { ... }`,
                 options: ['4', '5', '6', 'Forever'], answer: 2,
-                explain: 'i takes the values 0, 1, 2, 3, 4 and 5. That is six iterations.' },
+                explain: R`<code>i</code> takes the values 0, 1, 2, 3, 4, and 5: six iterations.` },
               { type: 'code', prompt: 'Use a loop to print the numbers 1 through 5 separated by spaces, then a newline. Expected output: <code>1 2 3 4 5</code>',
                 starter: R`#include <stdio.h>
 
@@ -462,7 +545,7 @@ int main(void)
 }`,
                 expected: '1 2 3 4 5\n',
                 requires: [{ re: R`\b(for|while)\b`, msg: 'Use a for or while loop.' }],
-                hint: 'Print the number and a space inside the loop. Trailing spaces are ignored when checking.',
+                hint: 'Print the number and a space inside the loop, then the newline after it. Trailing spaces are ignored.',
                 solution: R`#include <stdio.h>
 
 int main(void)
@@ -478,7 +561,7 @@ int main(void)
             id: 'c2-3', title: 'Functions',
             steps: [
               { type: 'learn', title: 'Arguments are copies',
-                body: R`<p>A function in C receives copies of its arguments. Changing a parameter inside the function does nothing to the caller's variable. Keep this in mind. It is the reason pointers exist, two units from now.</p><p>If you call a function before its definition, declare a prototype first so the compiler knows its signature.</p>`,
+                body: R`<p>A C function receives copies of its arguments. Changing a parameter inside the function does nothing to the caller's variable. This is why functions that need to modify the caller's data take pointers, two units from now.</p><p>One wrinkle: an array argument is passed as a pointer to its first element, so a function <em>can</em> change the caller's array.</p><p>If you call a function before its definition, declare a prototype first so the compiler knows its signature.</p>`,
                 code: R`int square(int n);          /* prototype */
 
 int main(void)
@@ -498,8 +581,8 @@ int main(void)
     return 0;
 }`,
                 options: ['8', '7', '0', 'It depends on the compiler'], answer: 1,
-                explain: 'bump gets its own copy of the value 7. Incrementing that copy leaves x in main untouched.' },
-              { type: 'code', prompt: 'Write <code>int max(int a, int b)</code> that returns the larger value. <code>main</code> already prints <code>max(3, 9)</code>.',
+                explain: R`<code>bump</code> gets its own copy of the value 7. Incrementing that copy leaves <code>x</code> in <code>main</code> untouched.` },
+              { type: 'code', prompt: 'Write <code>int max(int a, int b)</code> so that it returns the larger value. <code>main</code> already prints <code>max(3, 9)</code>. Expected output: <code>9</code>',
                 starter: R`#include <stdio.h>
 
 /* write max here */
@@ -511,7 +594,7 @@ int main(void)
 }`,
                 expected: '9\n',
                 requires: [{ re: R`int\s+max\s*\(`, msg: 'Define a function named max that returns int.' }],
-                hint: 'if (a > b) return a; return b;',
+                hint: '<code>if (a &gt; b) return a; return b;</code>',
                 solution: R`#include <stdio.h>
 
 int max(int a, int b)
@@ -537,14 +620,14 @@ int main(void)
             id: 'c3-1', title: 'Arrays',
             steps: [
               { type: 'learn', title: 'Contiguous memory, no safety net',
-                body: R`<p>An array is a block of same-typed values laid out back to back in memory. Indexing starts at 0, so the last element of <code>int a[6]</code> is <code>a[5]</code>.</p><p>C does not check bounds. Writing to <code>a[6]</code> silently overwrites whatever sits next in memory. In a kernel, that is how you corrupt someone else's data.</p>`,
+                body: R`<p>An array is a block of same-typed values laid out back to back in memory. Indexing starts at 0, so the last element of <code>int a[6]</code> is <code>a[5]</code>.</p><p>C does not check bounds. Writing to <code>a[6]</code> is undefined behavior: it may overwrite whatever sits next in memory, crash, or appear to work until much later. In a kernel, that is how you corrupt someone else's data.</p>`,
                 code: R`int a[4] = {3, 1, 4, 1};
 int n = sizeof(a) / sizeof(a[0]);  /* 4 elements */
 for (int i = 0; i < n; i++)
     printf("%d\n", a[i]);` },
-              { type: 'mcq', prompt: 'int arr[10]; on a system with 4-byte ints. What is sizeof(arr) / sizeof(arr[0])?',
+              { type: 'mcq', prompt: 'Given <code>int arr[10];</code> and 4-byte <code>int</code>s, what is <code>sizeof(arr) / sizeof(arr[0])</code>?',
                 options: ['4', '10', '40', '9'], answer: 1,
-                explain: 'sizeof(arr) is 40 bytes and sizeof(arr[0]) is 4 bytes, so the division gives the element count, 10. This only works on real arrays, not on pointers.' },
+                explain: R`<code>sizeof(arr)</code> is 40 bytes and <code>sizeof(arr[0])</code> is 4, so the division gives the element count, 10. This only works on a real array. Inside a function that received the array as a parameter, <code>arr</code> is a pointer and the trick silently gives the wrong answer.` },
               { type: 'code', prompt: 'Sum the array with a loop and print the total. Expected output: <code>108</code>',
                 starter: R`#include <stdio.h>
 
@@ -558,7 +641,7 @@ int main(void)
 }`,
                 expected: '108\n',
                 requires: [{ re: R`\b(for|while)\b`, msg: 'Use a loop rather than adding by hand.' }],
-                hint: 'for (int i = 0; i < 6; i++) sum += nums[i];',
+                hint: '<code>for (int i = 0; i &lt; 6; i++) sum += nums[i];</code>',
                 solution: R`#include <stdio.h>
 
 int main(void)
@@ -576,15 +659,15 @@ int main(void)
             id: 'c3-2', title: 'Strings are char arrays',
             steps: [
               { type: 'learn', title: 'The null terminator',
-                body: R`<p>C has no string type. A string is an array of <code>char</code> ending with a zero byte, written <code>'\0'</code>. Every string function walks memory until it finds that zero.</p><p>Forget the terminator and functions like <code>printf("%s")</code> keep reading past your data.</p>`,
+                body: R`<p>C has no string type. A string is an array of <code>char</code> ending with a zero byte, written <code>'\0'</code>. The standard string functions find the end of a string by scanning for that zero.</p><p>Forget the terminator and functions like <code>strlen</code> or <code>printf</code> with <code>%s</code> keep reading past your data.</p>`,
                 code: R`char s[] = "os";   /* 3 bytes: 'o' 's' '\0' */
 int i = 0;
 while (s[i] != '\0')
     i++;
 /* i is now 2 */` },
-              { type: 'mcq', prompt: 'char s[] = "pintos"; What is sizeof(s)?',
+              { type: 'mcq', prompt: 'Given <code>char s[] = "pintos";</code>, what is <code>sizeof(s)</code>?',
                 options: ['6', '7', '8', '1'], answer: 1,
-                explain: R`Six letters plus the <code>'\0'</code> terminator the compiler appends, so 7 bytes.` },
+                explain: R`Six letters plus the <code>'\0'</code> terminator the compiler appends: 7 bytes. <code>strlen(s)</code> would be 6.` },
               { type: 'code', prompt: 'Count the characters in <code>word</code> with a loop, without using <code>strlen</code>. Expected output: <code>6</code>',
                 starter: R`#include <stdio.h>
 
@@ -599,7 +682,7 @@ int main(void)
                 expected: '6\n',
                 requires: [{ re: R`\b(for|while)\b`, msg: 'Use a loop.' }],
                 forbids: [{ re: R`strlen`, msg: 'Do it without strlen.' }],
-                hint: R`while (word[len] != '\0') len++;`,
+                hint: R`<code>while (word[len] != '\0') len++;</code>`,
                 solution: R`#include <stdio.h>
 
 int main(void)
@@ -617,15 +700,15 @@ int main(void)
             id: 'c3-3', title: 'string.h',
             steps: [
               { type: 'learn', title: 'Library helpers, and their sharp edge',
-                body: R`<p><code>strlen</code> counts characters, <code>strcpy</code> copies, <code>strcat</code> appends, and <code>strcmp</code> returns 0 when two strings match.</p><p>None of them know how big your destination buffer is. If the result does not fit, they write past the end anyway. Pintos ships <code>strlcpy</code> for exactly this reason.</p>`,
+                body: R`<p><code>strlen</code> counts characters, <code>strcpy</code> copies, <code>strcat</code> appends, and <code>strcmp</code> returns 0 when two strings match.</p><p><code>strcpy</code> and <code>strcat</code> do not know how big the destination buffer is. If the result does not fit, they write past the end anyway. Pintos goes as far as disabling them and provides <code>strlcpy</code> and <code>strlcat</code>, which take the buffer size.</p>`,
                 code: R`char buf[32];
 strcpy(buf, "page");
 strcat(buf, "_fault");
 if (strcmp(buf, "page_fault") == 0)
     printf("match\n");` },
-              { type: 'mcq', prompt: 'strcmp("abc", "abc") returns what?',
-                options: ['1, because they are equal', '0', 'true', '3'], answer: 1,
-                explain: 'strcmp returns 0 for equal strings, a negative number if the first sorts earlier, and a positive number if it sorts later. Writing if (strcmp(a, b)) to test equality is a classic bug.' },
+              { type: 'mcq', prompt: 'What does <code>strcmp("abc", "abc")</code> return?',
+                options: ['<code>1</code>, because they are equal', '<code>0</code>', '<code>true</code>', '<code>3</code>'], answer: 1,
+                explain: R`<code>strcmp</code> returns 0 for equal strings, a negative number if the first sorts earlier, and a positive number if it sorts later. Writing <code>if (strcmp(a, b))</code> to test for equality is a classic bug: it is true when the strings differ.` },
               { type: 'code', prompt: 'Build <code>thread_create</code> in <code>buf</code> using <code>strcpy</code> and <code>strcat</code>, then print it and its length. Expected output: <code>thread_create 13</code>',
                 starter: R`#include <stdio.h>
 #include <string.h>
@@ -639,7 +722,7 @@ int main(void)
 }`,
                 expected: 'thread_create 13\n',
                 requires: [{ re: R`strcpy`, msg: 'Use strcpy for the first part.' }, { re: R`strcat`, msg: 'Use strcat to append.' }],
-                hint: R`strcpy(buf, "thread_"); strcat(buf, "create");`,
+                hint: R`<code>strcpy(buf, "thread_"); strcat(buf, "create");</code>`,
                 solution: R`#include <stdio.h>
 #include <string.h>
 
@@ -662,7 +745,7 @@ int main(void)
             id: 'c4-1', title: 'Addresses',
             steps: [
               { type: 'learn', title: 'A pointer holds an address',
-                body: R`<p><code>&amp;x</code> gives the address of x. A pointer variable stores such an address. <code>*p</code> follows the address to reach the value it points at.</p><p>The same star means two things: in a declaration, <code>int *p</code> says p is a pointer to int. In an expression, <code>*p</code> dereferences it.</p>`,
+                body: R`<p><code>&amp;x</code> gives the address of x. A pointer variable stores such an address. <code>*p</code> follows the address to reach the value stored there.</p><p>The star means two things. In a declaration, <code>int *p</code> says p is a pointer to <code>int</code>. In an expression, <code>*p</code> dereferences it.</p>`,
                 code: R`int x = 5;
 int *p = &x;   /* p holds the address of x */
 *p = 8;        /* write through the pointer */
@@ -672,11 +755,11 @@ int *p = &x;
 *p = *p + 10;
 printf("%d\n", x);`,
                 options: ['5', '10', '15', 'An address'], answer: 2,
-                explain: 'p points at x, so reading *p gives 5 and writing *p changes x itself. x becomes 15.' },
-              { type: 'mcq', prompt: 'What happens when you dereference a NULL pointer?',
-                options: ['You read 0', 'Undefined behavior, usually a crash', 'The compiler refuses to build', 'It returns NULL'], answer: 1,
-                explain: 'Dereferencing NULL is undefined behavior. On most systems address 0 is unmapped, so you get a segmentation fault. In a kernel it is a page fault you have to handle or panic on.' },
-              { type: 'code', prompt: 'Make <code>p</code> point at <code>x</code>, then change x to 99 by writing through p. Expected output: <code>99</code>',
+                explain: R`<code>p</code> points at <code>x</code>, so reading <code>*p</code> gives 5 and writing <code>*p</code> changes <code>x</code> itself. <code>x</code> becomes 15.` },
+              { type: 'mcq', prompt: 'What happens when you dereference a <code>NULL</code> pointer?',
+                options: ['You read 0', 'Undefined behavior, usually a crash', 'The compiler refuses to build it', 'It evaluates to <code>NULL</code>'], answer: 1,
+                explain: R`Dereferencing <code>NULL</code> is undefined behavior. On most systems the page at address 0 is deliberately left unmapped, so user programs get a segmentation fault. In Pintos the same bug triggers a page fault in the kernel, and the page fault handler decides whether to kill the process or panic.` },
+              { type: 'code', prompt: 'Make <code>p</code> point at <code>x</code>, then change <code>x</code> to 99 by writing through <code>p</code>. Expected output: <code>99</code>',
                 starter: R`#include <stdio.h>
 
 int main(void)
@@ -689,7 +772,7 @@ int main(void)
 }`,
                 expected: '99\n',
                 requires: [{ re: R`&\s*x`, msg: 'Take the address of x with &x.' }, { re: R`\*\s*p\s*=[^=]`, msg: 'Assign through the pointer with *p = ...' }],
-                hint: 'p = &x; *p = 99;',
+                hint: '<code>p = &amp;x; *p = 99;</code>',
                 solution: R`#include <stdio.h>
 
 int main(void)
@@ -707,7 +790,7 @@ int main(void)
             id: 'c4-2', title: 'Passing pointers',
             steps: [
               { type: 'learn', title: 'Letting a function change your variable',
-                body: R`<p>Arguments are copies, but a copy of an address still points at the original. Pass <code>&amp;x</code> and the function can modify x through the pointer.</p><p>This is how C returns more than one value, and how nearly every kernel API hands data back to you.</p>`,
+                body: R`<p>Arguments are copies, but a copy of an address still points at the original. Pass <code>&amp;x</code> and the function can modify x through the pointer.</p><p>This is the standard way for a C function to hand back more than one result, and a pattern you will see constantly in kernel code.</p>`,
                 code: R`void zero(int *p) { *p = 0; }
 
 int main(void)
@@ -720,9 +803,9 @@ int main(void)
 {
     int t = a; a = b; b = t;
 }`,
-                options: ['The temporary variable is wrong', 'It swaps copies, not the caller\'s variables', 'You cannot assign to parameters', 'It needs a return statement'], answer: 1,
-                explain: 'a and b are local copies. The function swaps them perfectly and then throws them away when it returns.' },
-              { type: 'code', prompt: 'Implement <code>swap</code> so that it exchanges the caller\'s values. Expected output: <code>2 1</code>',
+                options: ['The temporary variable is used incorrectly', 'It swaps copies, not the caller\'s variables', 'You cannot assign to parameters', 'It needs a return statement'], answer: 1,
+                explain: R`<code>a</code> and <code>b</code> are local copies. The function swaps them correctly, then discards them when it returns.` },
+              { type: 'code', prompt: 'Implement <code>swap</code> so that it exchanges the caller\'s two values. Expected output: <code>2 1</code>',
                 starter: R`#include <stdio.h>
 
 void swap(int *a, int *b)
@@ -739,7 +822,7 @@ int main(void)
 }`,
                 expected: '2 1\n',
                 requires: [{ re: R`\*\s*a\s*=[^=]`, msg: 'Write through a with *a = ...' }],
-                hint: 'int t = *a; *a = *b; *b = t;',
+                hint: '<code>int t = *a; *a = *b; *b = t;</code>',
                 solution: R`#include <stdio.h>
 
 void swap(int *a, int *b)
@@ -762,7 +845,7 @@ int main(void)
             id: 'c4-3', title: 'Pointer arithmetic',
             steps: [
               { type: 'learn', title: 'p + 1 moves one element, not one byte',
-                body: R`<p>Adding 1 to an <code>int *</code> advances it by <code>sizeof(int)</code> bytes, to the next int. That is why <code>*(p + i)</code> and <code>p[i]</code> are the same thing.</p><p>An array name converts to a pointer to its first element when you assign it: <code>int *p = arr;</code>. In this in-browser runner, do the arithmetic on a pointer variable like p rather than on the array name.</p>`,
+                body: R`<p>Adding 1 to an <code>int *</code> advances it by <code>sizeof(int)</code> bytes, to the next <code>int</code>. In fact, C defines <code>p[i]</code> as <code>*(p + i)</code>.</p><p>In most expressions, an array name converts to a pointer to its first element, which is why <code>int *p = arr;</code> works. The exceptions are <code>sizeof arr</code> and <code>&amp;arr</code>. This in-browser runner cannot do arithmetic on the array name itself, so use a pointer variable like <code>p</code>.</p>`,
                 code: R`int a[3] = {10, 20, 30};
 int *p = a;        /* points at a[0] */
 p = p + 2;         /* now points at a[2] */
@@ -772,8 +855,8 @@ int *p = a;
 p++;
 printf("%d\n", *p);`,
                 options: ['10', '11', '20', 'An address'], answer: 2,
-                explain: 'p++ moves the pointer to the next int, a[1], which holds 20. It does not add 1 to the value.' },
-              { type: 'code', prompt: 'Walk the array with the pointer <code>p</code> (no <code>a[i]</code> indexing) and print each value followed by a space. Expected output: <code>10 20 30 40</code>',
+                explain: R`<code>p++</code> moves the pointer to the next element, <code>a[1]</code>, which holds 20. It does not add 1 to the value.` },
+              { type: 'code', prompt: 'Walk the array using the pointer <code>p</code>, without <code>a[i]</code> indexing, and print each value followed by a space. Expected output: <code>10 20 30 40</code>',
                 starter: R`#include <stdio.h>
 
 int main(void)
@@ -787,7 +870,7 @@ int main(void)
                 expected: '10 20 30 40\n',
                 requires: [{ re: R`\*\s*\(?\s*p`, msg: 'Read the values with *p or *(p + i).' }],
                 forbids: [{ re: R`a\s*\[\s*[a-z_]`, msg: 'Use the pointer instead of indexing a with a variable.' }],
-                hint: 'for (int i = 0; i < 4; i++) { printf("%d ", *p); p++; }',
+                hint: '<code>for (int i = 0; i &lt; 4; i++) { printf("%d ", *p); p++; }</code>',
                 solution: R`#include <stdio.h>
 
 int main(void)
@@ -812,7 +895,7 @@ int main(void)
             id: 'c5-1', title: 'Defining structs',
             steps: [
               { type: 'learn', title: 'Grouping fields',
-                body: R`<p>A <code>struct</code> bundles related fields into one type. Access fields with a dot. <code>typedef</code> gives the type a shorter name.</p><p>Pintos represents every thread as a <code>struct thread</code> with fields such as its id, status and priority.</p>`,
+                body: R`<p>A <code>struct</code> bundles related fields into one type. Access fields with a dot. <code>typedef</code> gives the type a second, shorter name.</p><p>Pintos represents every thread as a <code>struct thread</code>, with fields such as its id, status, and priority.</p>`,
                 code: R`struct point {
     int x;
     int y;
@@ -821,10 +904,10 @@ int main(void)
 struct point p;
 p.x = 3;
 p.y = 4;` },
-              { type: 'mcq', prompt: 'Given typedef struct point point_t; which declaration is valid?',
-                options: ['point p;', 'point_t p;', 'typedef p;', 'struct point_t p;'], answer: 1,
-                explain: 'The typedef creates the name point_t as an alias for struct point. You could also still write struct point p;' },
-              { type: 'code', prompt: 'Declare a <code>struct thread</code> variable, set <code>tid</code> to 1 and <code>priority</code> to 31, and print it. Expected output: <code>tid=1 priority=31</code>',
+              { type: 'mcq', prompt: 'Given <code>typedef struct point point_t;</code>, which declaration is valid?',
+                options: ['<code>point p;</code>', '<code>point_t p;</code>', '<code>typedef p;</code>', '<code>struct point_t p;</code>'], answer: 1,
+                explain: R`The <code>typedef</code> makes <code>point_t</code> an alias for <code>struct point</code>. Writing <code>struct point p;</code> still works too.` },
+              { type: 'code', prompt: 'The <code>struct thread</code> variable <code>t</code> is declared. Set its <code>tid</code> to 1 and its <code>priority</code> to 31. Expected output: <code>tid=1 priority=31</code>',
                 starter: R`#include <stdio.h>
 
 struct thread {
@@ -841,7 +924,7 @@ int main(void)
 }`,
                 expected: 'tid=1 priority=31\n',
                 requires: [{ re: R`t\s*\.\s*tid\s*=[^=]`, msg: 'Assign t.tid.' }],
-                hint: 't.tid = 1; t.priority = 31;',
+                hint: '<code>t.tid = 1; t.priority = 31;</code>',
                 solution: R`#include <stdio.h>
 
 struct thread {
@@ -863,14 +946,14 @@ int main(void)
             id: 'c5-2', title: 'The arrow operator',
             steps: [
               { type: 'learn', title: 'p->field means (*p).field',
-                body: R`<p>Structs are usually passed by pointer so the function can modify them and so the whole struct is not copied. Through a pointer, write <code>p-&gt;field</code> instead of the clumsier <code>(*p).field</code>.</p>`,
+                body: R`<p>Structs are usually passed by pointer, both so the function can modify them and to avoid copying the whole struct. Through a pointer, write <code>p-&gt;field</code> instead of the clumsier <code>(*p).field</code>.</p>`,
                 code: R`void move_right(struct point *p, int dx)
 {
     p->x += dx;
 }` },
-              { type: 'mcq', prompt: 't is a struct thread *. Which reads its priority?',
-                options: ['t.priority', 't->priority', '*t.priority', '&t->priority'], answer: 1,
-                explain: 'The arrow dereferences and accesses in one step. *t.priority parses as *(t.priority), which is wrong because the dot binds tighter than the star.' },
+              { type: 'mcq', prompt: '<code>t</code> is a <code>struct thread *</code>. Which expression reads its priority?',
+                options: ['<code>t.priority</code>', '<code>t-&gt;priority</code>', '<code>*t.priority</code>', '<code>&amp;t-&gt;priority</code>'], answer: 1,
+                explain: R`The arrow dereferences and accesses the field in one step. <code>*t.priority</code> parses as <code>*(t.priority)</code> because the dot binds tighter than the star, so it does not compile.` },
               { type: 'code', prompt: 'Write <code>void boost(struct thread *t)</code> that adds 10 to the thread\'s priority. Expected output: <code>41</code>',
                 starter: R`#include <stdio.h>
 
@@ -892,7 +975,7 @@ int main(void)
 }`,
                 expected: '41\n',
                 requires: [{ re: R`->\s*priority`, msg: 'Use the arrow operator inside boost.' }],
-                hint: 'void boost(struct thread *t) { t->priority += 10; }',
+                hint: '<code>void boost(struct thread *t) { t-&gt;priority += 10; }</code>',
                 solution: R`#include <stdio.h>
 
 struct thread {
@@ -925,7 +1008,7 @@ int main(void)
             id: 'c6-1', title: 'malloc and free',
             steps: [
               { type: 'learn', title: 'Memory that outlives a function',
-                body: R`<p>Local variables live on the stack and vanish when their function returns. <code>malloc(n)</code> hands you n bytes on the heap that stay valid until you call <code>free</code>.</p><p>Always check for <code>NULL</code>, free each block exactly once, and never touch it afterward. In Pintos you will use <code>malloc</code> for small objects and <code>palloc</code> for whole pages.</p>`,
+                body: R`<p>Local variables normally live on the stack and are gone once their function returns. <code>malloc(n)</code> returns n bytes on the heap that stay valid until you pass them to <code>free</code>.</p><p>Check the result for <code>NULL</code>, free each block exactly once, and never touch it afterward. The Pintos kernel has its own <code>malloc</code> for small objects and <code>palloc_get_page</code> for whole 4 KB pages.</p>`,
                 code: R`int *nums = malloc(5 * sizeof(int));
 if (nums == NULL)
     return 1;
@@ -937,9 +1020,9 @@ nums = NULL;   /* avoids accidental reuse */` },
     int count = 0;
     return &count;
 }`,
-                options: ['Nothing', 'count is on the stack and dies when the function returns', 'You cannot return pointers', 'count should be a char'], answer: 1,
-                explain: 'The returned pointer dangles: it points at stack memory that the next function call will reuse. Allocate with malloc instead if the value must outlive the call.' },
-              { type: 'code', prompt: 'Allocate room for 5 ints with <code>malloc</code>, fill slot i with i * i, print them separated by spaces, then <code>free</code> the block. Expected output: <code>0 1 4 9 16</code>',
+                options: ['Nothing', '<code>count</code> lives on the stack and is gone once the function returns', 'Functions cannot return pointers', '<code>count</code> should be a <code>char</code>'], answer: 1,
+                explain: R`The returned pointer dangles: it points at stack memory that is no longer reserved, and the next function call will likely overwrite it. If the value must outlive the call, allocate it with <code>malloc</code>.` },
+              { type: 'code', prompt: 'Allocate room for 5 <code>int</code>s with <code>malloc</code>, set element <code>i</code> to <code>i * i</code>, print the values separated by spaces, then <code>free</code> the block. Expected output: <code>0 1 4 9 16</code>',
                 starter: R`#include <stdio.h>
 #include <stdlib.h>
 
@@ -952,7 +1035,7 @@ int main(void)
 }`,
                 expected: '0 1 4 9 16\n',
                 requires: [{ re: R`malloc\s*\(`, msg: 'Allocate with malloc.' }, { re: R`free\s*\(`, msg: 'Release the block with free.' }],
-                hint: 'sq = malloc(5 * sizeof(int)); then loop to fill and print.',
+                hint: '<code>sq = malloc(5 * sizeof(int));</code>, then loop to fill the block and another loop to print it.',
                 solution: R`#include <stdio.h>
 #include <stdlib.h>
 
@@ -976,7 +1059,7 @@ int main(void)
             id: 'c6-2', title: 'Linked lists',
             steps: [
               { type: 'learn', title: 'Nodes pointing at nodes',
-                body: R`<p>A linked list is a chain of heap-allocated nodes, each holding a value and a pointer to the next node. The last node's <code>next</code> is <code>NULL</code>.</p><p>Pushing at the front is cheap: make a node, point it at the old head, and make it the new head. Because push has to change the caller's head pointer, it takes a pointer to that pointer.</p>`,
+                body: R`<p>A linked list is a chain of heap-allocated nodes, each holding a value and a pointer to the next node. The last node's <code>next</code> is <code>NULL</code>.</p><p>Pushing at the front is cheap: make a node, point it at the old head, and make it the new head. Because <code>push</code> has to change the caller's head pointer, it takes a pointer to that pointer.</p>`,
                 code: R`struct node {
     int value;
     struct node *next;
@@ -984,7 +1067,7 @@ int main(void)
 
 for (struct node *c = head; c != NULL; c = c->next)
     printf("%d\n", c->value);` },
-              { type: 'code', prompt: 'Finish <code>push</code> so it adds a node at the front. <code>main</code> pushes 1, 2, 3 and prints the list. Expected output: <code>3 2 1</code>',
+              { type: 'code', prompt: 'Finish <code>push</code> so that it adds a node at the front. <code>main</code> pushes 1, 2, and 3, then prints the list. Expected output: <code>3 2 1</code>',
                 starter: R`#include <stdio.h>
 #include <stdlib.h>
 
@@ -1013,7 +1096,7 @@ int main(void)
 }`,
                 expected: '3 2 1\n',
                 requires: [{ re: R`n\s*->\s*next\s*=[^=]`, msg: 'Set n->next.' }, { re: R`\*\s*head\s*=[^=]`, msg: 'Update the caller\'s head with *head = ...' }],
-                hint: 'n->value = value; n->next = *head; *head = n;',
+                hint: '<code>n-&gt;value = value; n-&gt;next = *head; *head = n;</code>',
                 solution: R`#include <stdio.h>
 #include <stdlib.h>
 
@@ -1042,29 +1125,30 @@ int main(void)
     printf("\n");
     return 0;
 }` },
-              { type: 'mcq', prompt: 'Your list has 3 nodes. What happens if main returns without freeing them in a long-running kernel?',
-                options: ['The compiler frees them', 'The memory leaks until the system reboots', 'They are freed when head goes out of scope', 'Nothing, 3 nodes is too small to matter'], answer: 1,
-                explain: 'A user program gets its memory back when the process exits. A kernel has no such safety net, so leaked blocks stay lost until reboot.' },
+              { type: 'mcq', prompt: 'Kernel code builds a 3-node list, then discards its head pointer without freeing the nodes. What happens?',
+                options: ['The compiler inserts the frees', 'The memory stays allocated until the machine reboots', 'The nodes are freed when <code>head</code> goes out of scope', 'Nothing; three nodes are too small to matter'], answer: 1,
+                explain: 'A user program gets all its memory back when the process exits. The kernel never exits, so a leak in kernel code is permanent until reboot, and a leak on a hot path eventually exhausts memory.' },
             ],
           },
           {
             id: 'c6-3', title: 'Pintos-style lists',
             steps: [
               { type: 'learn', title: 'The link lives inside your struct',
-                body: R`<p>Pintos does not use node structs like the ones you just built. Instead, you embed a <code>struct list_elem</code> inside your own struct, and the list links those elements together. This is called an intrusive list.</p><p>To get from an element back to the struct that contains it, Pintos uses the <code>list_entry</code> macro, which subtracts the element's offset within the struct from its address.</p>`,
+                body: R`<p>Pintos does not use separate node structs like the ones you just built. Instead, you embed a <code>struct list_elem</code> inside your own struct, and the list links those elements together. This is called an intrusive list.</p><p>To get from an element back to the struct that contains it, Pintos uses the <code>list_entry</code> macro, which subtracts the element's offset within the struct (from <code>offsetof</code>) from the element's address.</p>`,
                 code: R`struct thread {
     int tid;
     int priority;
-    struct list_elem elem;   /* link for the ready list */
+    struct list_elem elem;   /* link for the ready list or a wait list */
 };
 
+struct list_elem *e = list_front(&ready_list);
 struct thread *t = list_entry(e, struct thread, elem);` },
               { type: 'mcq', prompt: 'In an intrusive list, where does the link pointer live?',
                 options: ['In a separate node allocated by the list', 'Inside the struct being stored', 'In a global array', 'On the stack of the caller'], answer: 1,
-                explain: 'The struct list_elem is a field of your struct, so adding a thread to a list allocates nothing. A struct can even sit on two lists at once by embedding two elems.' },
-              { type: 'mcq', prompt: 'list_entry(e, struct thread, elem) needs which piece of information to work?',
-                options: ['The length of the list', 'The byte offset of elem within struct thread', 'The thread\'s tid', 'The address of the list head'], answer: 1,
-                explain: 'Knowing where elem sits inside struct thread lets the macro subtract that offset from e and land on the start of the enclosing struct.' },
+                explain: R`The <code>struct list_elem</code> is a field of your struct, so adding a thread to a list allocates nothing. A struct can sit on two lists at once by embedding two elements; Pintos threads have <code>allelem</code> as well as <code>elem</code>.` },
+              { type: 'mcq', prompt: 'What does <code>list_entry(e, struct thread, elem)</code> need to know to work?',
+                options: ['The length of the list', 'The byte offset of <code>elem</code> within <code>struct thread</code>', 'The thread\'s <code>tid</code>', 'The address of the list head'], answer: 1,
+                explain: R`Knowing where <code>elem</code> sits inside <code>struct thread</code> lets the macro subtract that offset from <code>e</code> and land on the start of the enclosing struct.` },
             ],
           },
         ],
@@ -1105,6 +1189,14 @@ if (typeof module !== 'undefined') module.exports = { TRACKS };
     for (const c of [].concat(kids)) if (c != null) n.append(c);
     return n;
   };
+  const ICONS = {
+    x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+    play: '<polygon points="6 3 20 12 6 21 6 3"/>',
+    bulb: '<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>',
+    undo: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+    eye: '<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/>',
+  };
+  const icon = n => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[n] + '</svg>';
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
   function allLessons(tk) { const out = []; TRACKS[tk].units.forEach(u => u.lessons.forEach(l => out.push(l))); return out; }
@@ -1194,7 +1286,7 @@ if (typeof module !== 'undefined') module.exports = { TRACKS };
           type: 'button', class: 'node pad' + (done ? ' done' : '') + (cur ? ' current' : ''),
           'aria-label': r.lesson.title + (done ? ', completed' : cur ? ', up next' : ''),
           onclick: () => openLesson(r.lesson),
-        }, [el('span', { class: 'pad-label ' + side, html: esc(r.lesson.title) + '<span>' + (done ? 'done' : cur ? 'up next' : r.lesson.steps.length + ' steps') + '</span>' })]);
+        }, [el('span', { class: 'pad-label ' + side, html: esc(r.lesson.title) + '<br><span class="' + (done ? 'is-done' : cur ? 'is-next' : '') + '">' + (done ? 'Done' : cur ? 'Up next' : r.lesson.steps.length + ' steps') + '</span>' })]);
         btn.style.left = r.x + 'px'; btn.style.top = r.y + 'px';
         host.append(btn);
         if (cur) r.el = btn;
@@ -1332,6 +1424,7 @@ self.postMessage({ ready: true });`;
     renderAll(false);
     if (lastFocus) lastFocus.focus();
   }
+  $('#p-close').innerHTML = icon('x');
   $('#p-close').addEventListener('click', closePlayer);
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && player.classList.contains('open')) closePlayer(); });
 
@@ -1373,7 +1466,7 @@ self.postMessage({ ready: true });`;
   }
 
   function stepMcq(s) {
-    heading('Quick check', 'Pick one');
+    heading(P.lesson.title, 'Quick check');
     inner.append(el('p', { class: 'prompt', html: s.prompt }));
     if (s.code) inner.append(el('pre', { class: 'sample', text: s.code }));
     let pick = null;
@@ -1381,7 +1474,7 @@ self.postMessage({ ready: true });`;
     const btns = s.options.map((o, j) => {
       const b = el('button', { type: 'button', class: 'opt', role: 'radio', 'aria-checked': 'false',
         onclick: () => { pick = j; btns.forEach((x, q) => x.setAttribute('aria-checked', String(q === j))); setMain('Check', check); } },
-        [el('kbd', { text: String(j + 1) }), el('span', { text: o })]);
+        [el('kbd', { text: String(j + 1) }), el('span', { html: o })]);
       return b;
     });
     btns.forEach(b => box.append(b));
@@ -1434,22 +1527,22 @@ self.postMessage({ ready: true });`;
         e.preventDefault(); if (!mainBtn.disabled) mainBtn.click();
       }
     });
-    const runBtn = el('button', { type: 'button', class: 'btn small', text: 'Run', onclick: onRun });
+    const runBtn = el('button', { type: 'button', class: 'btn small', html: icon('play') + '<span>Run</span>', onclick: onRun });
     const ed = el('div', { class: 'editor' }, [el('div', { class: 'ed-bar' }, [el('span', { class: 'sp', text: label }), runBtn]), wrap]);
     setTimeout(sync, 0);
     return { ed, ta, sync, runBtn };
   }
 
   function stepCode(s) {
-    heading('Write C', 'Your turn');
+    heading(P.lesson.title, 'Write the code');
     inner.append(el('p', { class: 'prompt', html: s.prompt }));
     const term = el('div', { class: 'term' }, [el('div', { class: 'term-h' }, [el('span', { text: 'stdout' }), el('span', { class: 'status', text: '' })]), el('pre', { class: 'muted', text: 'Press Run to execute, or Check when you think it is right.' })]);
     const E = makeEditor(s.starter, 'main.c', () => doRun(false));
     inner.append(E.ed);
     const tools = el('div', { class: 'tools' });
-    const hintBtn = el('button', { type: 'button', class: 'btn small', text: 'Hint', onclick: () => { if (!$('.hint', inner)) tools.after(el('div', { class: 'hint', text: s.hint })); hintBtn.disabled = true; } });
-    const solBtn = el('button', { type: 'button', class: 'btn small', text: 'Show solution', onclick: () => { E.ta.value = s.solution; E.sync(); P.stepState.usedSolution = true; solBtn.disabled = true; } });
-    const resetBtn = el('button', { type: 'button', class: 'btn small', text: 'Reset code', onclick: () => { E.ta.value = s.starter; E.sync(); } });
+    const hintBtn = el('button', { type: 'button', class: 'btn small', html: icon('bulb') + '<span>Hint</span>', onclick: () => { if (!$('.hint', inner)) tools.after(el('div', { class: 'hint', html: s.hint })); hintBtn.disabled = true; } });
+    const solBtn = el('button', { type: 'button', class: 'btn small', html: icon('eye') + '<span>Show solution</span>', onclick: () => { E.ta.value = s.solution; E.sync(); P.stepState.usedSolution = true; solBtn.disabled = true; } });
+    const resetBtn = el('button', { type: 'button', class: 'btn small', html: icon('undo') + '<span>Reset code</span>', onclick: () => { E.ta.value = s.starter; E.sync(); } });
     solBtn.hidden = true;
     tools.append(hintBtn, resetBtn, solBtn);
     inner.append(tools, term);
@@ -1458,18 +1551,21 @@ self.postMessage({ ready: true });`;
     async function doRun(grading) {
       const pre = term.querySelector('pre'), status = term.querySelector('.status');
       E.runBtn.disabled = true; mainBtn.disabled = true;
-      pre.className = 'muted'; pre.textContent = 'Running…'; status.textContent = '';
+      pre.className = 'muted'; pre.textContent = ''; status.textContent = 'running';
+      const skel = el('div', { class: 'skel', 'aria-label': 'Running' }, [el('i'), el('i'), el('i')]);
+      pre.hidden = true; pre.after(skel);
       const r = await CRun.run(E.ta.value);
+      skel.remove(); pre.hidden = false;
       E.runBtn.disabled = false; mainBtn.disabled = false;
       if (r.unavailable) {
         pre.className = 'err';
         pre.textContent = 'The C runner could not start in this browser' + (r.why ? ' (' + r.why + ')' : '') + '. Compare your code with the solution, or try another browser.';
-        if (grading) { solBtn.hidden = false; setFoot('bad', 'Runner unavailable', 'You can reveal the solution and mark this step done yourself.'); setMain('Mark done', () => { award(false); next(); }); }
+        if (grading) { solBtn.hidden = false; setFoot('warn', 'Runner unavailable', 'You can reveal the solution and mark this step done yourself.'); setMain('Mark done', () => { award(false); next(); }); }
         return;
       }
       if (r.timeout) {
-        pre.className = 'err'; pre.textContent = 'Stopped after 5 seconds. Is there a loop that never ends?'; status.textContent = 'timeout';
-        if (grading) fail('It never finished', 'Your program ran for more than 5 seconds. Check your loop condition.');
+        pre.className = 'warn'; pre.textContent = 'Stopped after 5 seconds. Is there a loop that never ends?'; status.textContent = 'timeout';
+        if (grading) fail('It never finished', 'Your program ran for more than 5 seconds. Check your loop condition.', 'warn');
         return;
       }
       pre.className = r.error ? 'err' : '';
@@ -1482,17 +1578,17 @@ self.postMessage({ ready: true });`;
         return fail('The output does not match yet',
           '<div class="diff"><div><span>expected</span><pre>' + esc(want || '(nothing)') + '</pre></div><div><span>yours</span><pre>' + esc(got || '(nothing)') + '</pre></div></div>');
       }
-      for (const q of s.requires || []) if (!new RegExp(q.re).test(E.ta.value)) return fail('Right output, different route', esc(q.msg));
-      for (const q of s.forbids || []) if (new RegExp(q.re).test(E.ta.value)) return fail('Right output, different route', esc(q.msg));
+      for (const q of s.requires || []) if (!new RegExp(q.re).test(E.ta.value)) return fail('Right output, but not the technique this step practices', esc(q.msg));
+      for (const q of s.forbids || []) if (new RegExp(q.re).test(E.ta.value)) return fail('Right output, but not the technique this step practices', esc(q.msg));
       const first = P.stepState.tries === 0 && !P.stepState.usedSolution;
       award(first);
       setFoot('ok', first ? 'Correct on the first run' : 'That works', 'Output matches exactly.');
       setMain('Continue', next); mainBtn.focus();
     }
-    function fail(title, body) {
+    function fail(title, body, kind) {
       P.stepState.tries++;
       if (P.stepState.tries >= 2) solBtn.hidden = false;
-      setFoot('bad', title, body);
+      setFoot(kind || 'bad', title, body);
       setMain('Check again', () => doRun(true));
     }
   }
@@ -1522,7 +1618,7 @@ self.postMessage({ ready: true });`;
         el('div', {}, [el('b', { text: acc }), el('span', { text: 'first-try accuracy' })]),
       ]),
     ]));
-    setFoot('ok', state.streak + ' day streak', firstTime ? 'The next pad up the stack is lit.' : 'Progress was already saved for this lesson.');
+    setFoot('ok', state.streak + '-day streak', firstTime ? 'The next pad up the stack is lit.' : 'Progress was already saved for this lesson.');
     setMain('Back to the stack', closePlayer);
     mainBtn.focus();
   }

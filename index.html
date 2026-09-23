@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Bottoms Up: C</title>
+<title>Bottoms Up: C and Python</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -75,6 +75,13 @@ code { font-family: var(--mono); font-size: .88em; background: color-mix(in srgb
 }
 .brand { font-family: var(--display); font-weight: 700; font-size: var(--fs-xl); letter-spacing: .02em; margin-right: auto; display: flex; align-items: baseline; gap: 12px; }
 .brand small { font-family: var(--mono); font-weight: 400; font-size: var(--fs-xs); color: var(--silk-dim); }
+.tracks { display: inline-flex; border: 1.5px solid var(--silk-dim); border-radius: 8px; overflow: hidden; }
+.tracks button { background: none; border: 0; padding: 4px 16px; cursor: pointer; font-family: var(--display); font-weight: 600; font-size: var(--fs-sm); color: var(--silk-dim); transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+.tracks button + button { border-left: 1px solid color-mix(in srgb, var(--silk) 18%, transparent); }
+.tracks button:hover { color: var(--silk); background: color-mix(in srgb, var(--silk) 8%, transparent); }
+.tracks button:active { transform: scale(0.98); }
+.tracks button[aria-pressed="true"] { background: var(--copper); color: var(--on-copper); }
+.skel-msg { font-family: var(--mono); font-size: var(--fs-xs); color: var(--silk-dim); }
 .stats { display: flex; gap: 16px; font-family: var(--mono); font-size: var(--fs-sm); color: var(--silk-dim); }
 .stats b { color: var(--silk); font-weight: 600; }
 
@@ -324,6 +331,7 @@ pre.sample {
 <body>
 <header class="bar">
   <div class="brand">Bottoms Up <small>learn by running it</small></div>
+  <div class="tracks" id="tracks" role="group" aria-label="Choose a track"></div>
   <div class="stats" aria-live="polite">
     <span><b id="st-xp">0</b> xp</span>
     <span><b id="st-streak">0</b> day streak</span>
@@ -338,7 +346,8 @@ pre.sample {
 <footer>
   <details>
     <summary>How the code runs</summary>
-    <p>Your code runs in your browser through PicoC, a small C interpreter compiled to WebAssembly. It covers everything these lessons need, but it is not a full C compiler: it does not support <code>const</code>, struct initializer lists such as <code>{3, 4}</code>, function pointers, or arithmetic directly on an array name. A real compiler such as gcc accepts all of them.</p>
+    <p>Python runs on Pyodide, the real CPython interpreter compiled to WebAssembly. The first Python run downloads about 10 MB from a public CDN, and NumPy adds a few more; after that your browser caches it. PyTorch and Keras are not available in Pyodide, so their lessons use reading questions and NumPy exercises instead.</p>
+    <p>C runs in your browser through PicoC, a small C interpreter compiled to WebAssembly. It covers everything these lessons need, but it is not a full C compiler: it does not support <code>const</code>, struct initializer lists such as <code>{3, 4}</code>, function pointers, or arithmetic directly on an array name. A real compiler such as gcc accepts all of them.</p>
     <p>Progress is saved in this browser only. <button class="linkish" id="reset" type="button">Reset progress</button></p>
   </details>
 </footer>
@@ -365,6 +374,8 @@ const R = String.raw;
 const TRACKS = {
   c: {
     name: 'C',
+    tab: 'C',
+    lang: 'c',
     blurb: 'From printf to pointers, structs and the heap, in the order Pintos will ask for them.',
     units: [
       {
@@ -1158,7 +1169,877 @@ struct thread *t = list_entry(e, struct thread, elem);` },
 
 };
 
-if (typeof module !== 'undefined') module.exports = { TRACKS };
+
+
+/* Python and library tracks. Original material. */
+const PY_TRACKS = {
+  py: {
+    name: 'Python',
+    tab: 'Python',
+    lang: 'py',
+    blurb: 'The language itself, with notes on where it differs from C.',
+    units: [
+      {
+        title: 'Values and names',
+        lessons: [
+          {
+            id: 'p1-1', title: 'print and variables',
+            steps: [
+              { type: 'learn', title: 'No main, no types, no semicolons',
+                body: R`<p>A Python file runs from top to bottom. There is no <code>main</code> to declare and nothing to compile first.</p><p>Variables do not have declared types. A name simply refers to a value, and the value carries its own type. An f-string, written with an <code>f</code> before the quote, drops values into text wherever you put <code>{braces}</code>.</p>`,
+                code: R`name = "Pintos"
+threads = 4
+print(f"{name} has {threads} threads")   # Pintos has 4 threads
+print(type(threads))                     # <class 'int'>` },
+              { type: 'mcq', prompt: 'What does <code>print(type(7 / 2))</code> show?',
+                options: ["<code>&lt;class 'int'&gt;</code>", "<code>&lt;class 'float'&gt;</code>", "<code>&lt;class 'str'&gt;</code>", 'An error'], answer: 1,
+                explain: R`In Python 3, <code>/</code> always produces a <code>float</code>, even when both operands are integers. <code>7 / 2</code> is <code>3.5</code>. This is the opposite of C.` },
+              { type: 'code', prompt: 'Set <code>lang</code> to <code>"Python"</code> and <code>year</code> to <code>1991</code>, then print them with an f-string. Expected output: <code>Python first appeared in 1991</code>',
+                starter: R`lang = ""
+year = 0
+# print with an f-string
+`,
+                expected: 'Python first appeared in 1991\n',
+                requires: [{ re: R`f["']`, msg: 'Use an f-string.' }, { re: R`\{\s*year\s*\}`, msg: 'Insert year with {year}.' }],
+                hint: R`<code>print(f"{lang} first appeared in {year}")</code>`,
+                solution: R`lang = "Python"
+year = 1991
+print(f"{lang} first appeared in {year}")
+` },
+            ],
+          },
+          {
+            id: 'p1-2', title: 'Numbers',
+            steps: [
+              { type: 'learn', title: 'Two kinds of division',
+                body: R`<p><code>/</code> is true division and returns a <code>float</code>. <code>//</code> is floor division and <code>%</code> is the remainder. <code>**</code> raises to a power.</p><p>Watch negatives: <code>//</code> rounds toward negative infinity, so <code>-7 // 2</code> is <code>-4</code>, while C's <code>-7 / 2</code> is <code>-3</code>. Python integers also never overflow; they grow as large as memory allows.</p>`,
+                code: R`print(7 / 2)     # 3.5
+print(7 // 2)    # 3
+print(-7 // 2)   # -4
+print(2 ** 100)  # 1267650600228229401496703205376` },
+              { type: 'mcq', prompt: 'What does <code>print(-7 // 2)</code> show?',
+                options: ['<code>-3</code>', '<code>-4</code>', '<code>-3.5</code>', '<code>3</code>'], answer: 1,
+                explain: R`Floor division rounds toward negative infinity. -3.5 floors to -4. C truncates toward zero instead, which gives -3.` },
+              { type: 'code', prompt: 'Print the floor quotient and the remainder of 17 divided by 5, separated by a space. Expected output: <code>3 2</code>',
+                starter: R`a = 17
+b = 5
+`,
+                expected: '3 2\n',
+                requires: [{ re: R`//`, msg: 'Use // for the quotient.' }, { re: R`%`, msg: 'Use % for the remainder.' }],
+                hint: R`<code>print(a // b, a % b)</code> separates its arguments with a space.`,
+                solution: R`a = 17
+b = 5
+print(a // b, a % b)
+` },
+            ],
+          },
+          {
+            id: 'p1-3', title: 'Strings',
+            steps: [
+              { type: 'learn', title: 'Indexing and slicing',
+                body: R`<p>Strings are sequences, so <code>s[0]</code> is the first character and <code>s[-1]</code> is the last. A slice <code>s[start:stop]</code> includes <code>start</code> and excludes <code>stop</code>. An optional third number is the step.</p><p>Strings are immutable: every operation that seems to change one builds a new string.</p>`,
+                code: R`s = "kernel"
+print(s[0], s[-1])   # k l
+print(s[1:4])        # ern
+print(s[::2])        # kre
+print(s.upper())     # KERNEL` },
+              { type: 'mcq', prompt: 'What is <code>"pintos"[1:4]</code>?',
+                options: ['<code>"pin"</code>', '<code>"int"</code>', '<code>"into"</code>', '<code>"ntos"</code>'], answer: 1,
+                explain: R`Indexes 1, 2, and 3 are i, n, and t. The stop index, 4, is excluded.` },
+              { type: 'code', prompt: 'Print <code>word</code> reversed using a slice. Expected output: <code>lenrek</code>',
+                starter: R`word = "kernel"
+`,
+                expected: 'lenrek\n',
+                requires: [{ re: R`\[\s*:\s*:\s*-1\s*\]`, msg: 'Use the slice [::-1].' }],
+                hint: R`A step of <code>-1</code> walks backward: <code>word[::-1]</code>.`,
+                solution: R`word = "kernel"
+print(word[::-1])
+` },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'Control flow',
+        lessons: [
+          {
+            id: 'p2-1', title: 'if, elif, else',
+            steps: [
+              { type: 'learn', title: 'Indentation is the syntax',
+                body: R`<p>Python marks blocks with indentation instead of braces. A colon ends the line that opens a block, and every line in the block is indented the same amount, conventionally four spaces.</p><p>Empty values count as false: <code>0</code>, <code>""</code>, <code>[]</code>, <code>{}</code>, and <code>None</code>. Nearly everything else is true.</p>`,
+                code: R`n = 0
+if n > 0:
+    print("positive")
+elif n == 0:
+    print("zero")
+else:
+    print("negative")` },
+              { type: 'mcq', prompt: 'What does <code>print(bool([]))</code> show?',
+                options: ['<code>True</code>', '<code>False</code>', '<code>[]</code>', '<code>None</code>'], answer: 1,
+                explain: R`An empty list is falsy, so <code>if items:</code> is the idiomatic way to ask whether a list has anything in it.` },
+              { type: 'code', prompt: 'Print <code>even</code> or <code>odd</code> depending on <code>n</code>. Expected output: <code>even</code>',
+                starter: R`n = 42
+`,
+                expected: 'even\n',
+                requires: [{ re: R`\bif\b`, msg: 'Use an if statement.' }, { re: R`%\s*2`, msg: 'Check the remainder with % 2.' }],
+                hint: R`<code>if n % 2 == 0:</code> then an indented <code>print</code>, then <code>else:</code>.`,
+                solution: R`n = 42
+if n % 2 == 0:
+    print("even")
+else:
+    print("odd")
+` },
+            ],
+          },
+          {
+            id: 'p2-2', title: 'Loops',
+            steps: [
+              { type: 'learn', title: 'for walks over things',
+                body: R`<p>Python's <code>for</code> loop iterates over the items of a sequence rather than counting an index. To count, iterate over <code>range(start, stop)</code>, which stops before <code>stop</code>, just like a slice.</p><p><code>print</code> ends with a newline by default. Pass <code>end=" "</code> to end with a space instead.</p>`,
+                code: R`for ch in "os":
+    print(ch)            # o, then s
+
+for i in range(3):
+    print(i, end=" ")    # 0 1 2
+print()` },
+              { type: 'mcq', prompt: 'How many numbers does <code>range(0, 10, 3)</code> produce?',
+                options: ['<code>3</code>', '<code>4</code>', '<code>10</code>', '<code>9</code>'], answer: 1,
+                explain: R`It produces 0, 3, 6, and 9. The next value, 12, would pass the stop value of 10.` },
+              { type: 'code', prompt: 'Use a loop to print the numbers 1 through 5 on one line, separated by spaces. Expected output: <code>1 2 3 4 5</code>',
+                starter: R`# your loop here
+`,
+                expected: '1 2 3 4 5\n',
+                requires: [{ re: R`\bfor\b|\bwhile\b`, msg: 'Use a for or while loop.' }],
+                hint: R`<code>for i in range(1, 6):</code> with <code>print(i, end=" ")</code>, then a bare <code>print()</code>. Trailing spaces are ignored.`,
+                solution: R`for i in range(1, 6):
+    print(i, end=" ")
+print()
+` },
+            ],
+          },
+          {
+            id: 'p2-3', title: 'Functions',
+            steps: [
+              { type: 'learn', title: 'def and return',
+                body: R`<p><code>def</code> defines a function. A function without a <code>return</code> statement returns <code>None</code>. Parameters can have default values.</p><p>Defaults are evaluated once, when the function is defined. That makes a mutable default such as <code>[]</code> a trap: every call shares the same list. Use <code>None</code> and create the list inside instead.</p>`,
+                code: R`def greet(name, greeting="Hello"):
+    return f"{greeting}, {name}!"
+
+print(greet("Ada"))           # Hello, Ada!
+print(greet("Ada", "Hi"))     # Hi, Ada!` },
+              { type: 'mcq', prompt: 'What does this print?', code: R`def add(item, bucket=[]):
+    bucket.append(item)
+    return bucket
+
+add(1)
+print(add(2))`,
+                options: ['<code>[2]</code>', '<code>[1, 2]</code>', '<code>[1]</code>', 'An error'], answer: 1,
+                explain: R`The default list is created once and reused by every call, so the second call appends to the list the first call already filled.` },
+              { type: 'code', prompt: 'Write <code>larger(a, b)</code> so that it returns the larger value, without using the built-in <code>max</code>. Expected output: <code>9</code>',
+                starter: R`# define larger here
+
+print(larger(3, 9))
+`,
+                expected: '9\n',
+                requires: [{ re: R`def\s+larger\s*\(`, msg: 'Define a function named larger.' }],
+                forbids: [{ re: R`\bmax\s*\(`, msg: 'Write the comparison yourself instead of calling max.' }],
+                hint: R`<code>if a &gt; b:</code> return <code>a</code>; otherwise return <code>b</code>.`,
+                solution: R`def larger(a, b):
+    if a > b:
+        return a
+    return b
+
+print(larger(3, 9))
+` },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'Collections',
+        lessons: [
+          {
+            id: 'p3-1', title: 'Lists',
+            steps: [
+              { type: 'learn', title: 'Growable, mixed, indexed',
+                body: R`<p>A list is an ordered sequence you can change. It grows with <code>append</code>, reports its size with <code>len</code>, and supports the same indexing and slicing as strings.</p><p>Unlike a C array, a list checks its bounds. <code>nums[10]</code> on a short list raises <code>IndexError</code> instead of reading stray memory.</p>`,
+                code: R`nums = [3, 1, 4]
+nums.append(1)
+print(nums, len(nums))   # [3, 1, 4, 1] 4
+print(nums[-1])          # 1` },
+              { type: 'mcq', prompt: 'Given <code>nums = [10, 20, 30]</code>, what is <code>nums[-1]</code>?',
+                options: ['<code>10</code>', '<code>30</code>', '<code>IndexError</code>', '<code>-1</code>'], answer: 1,
+                explain: R`Negative indexes count from the end, so <code>-1</code> is the last item.` },
+              { type: 'code', prompt: 'Add up the list with a loop, without using the built-in <code>sum</code>. Expected output: <code>108</code>',
+                starter: R`nums = [4, 8, 15, 16, 23, 42]
+total = 0
+# loop here
+print(total)
+`,
+                expected: '108\n',
+                requires: [{ re: R`\bfor\b|\bwhile\b`, msg: 'Use a loop.' }],
+                forbids: [{ re: R`\bsum\s*\(`, msg: 'Do it without sum().' }],
+                hint: R`<code>for n in nums:</code> then <code>total += n</code>.`,
+                solution: R`nums = [4, 8, 15, 16, 23, 42]
+total = 0
+for n in nums:
+    total += n
+print(total)
+` },
+            ],
+          },
+          {
+            id: 'p3-2', title: 'Dictionaries',
+            steps: [
+              { type: 'learn', title: 'Lookup by key',
+                body: R`<p>A dictionary maps keys to values. Looking up a missing key with <code>d[key]</code> raises <code>KeyError</code>; <code>d.get(key, default)</code> returns the default instead.</p><p>Dictionaries remember the order in which keys were first inserted, so printing one lists keys in that order.</p>`,
+                code: R`ages = {"ana": 20, "ben": 22}
+ages["chen"] = 19
+print(ages["ben"])          # 22
+print(ages.get("dara", 0))  # 0
+for name, age in ages.items():
+    print(name, age)` },
+              { type: 'code', prompt: 'Count how many times each word appears in <code>text</code> and print the dictionary. Expected output: <code>{\'the\': 2, \'cat\': 1, \'hat\': 1}</code>',
+                starter: R`text = "the cat the hat"
+counts = {}
+# fill counts
+print(counts)
+`,
+                expected: "{'the': 2, 'cat': 1, 'hat': 1}\n",
+                requires: [{ re: R`\bfor\b`, msg: 'Loop over the words.' }],
+                hint: R`<code>for w in text.split():</code> then <code>counts[w] = counts.get(w, 0) + 1</code>.`,
+                solution: R`text = "the cat the hat"
+counts = {}
+for w in text.split():
+    counts[w] = counts.get(w, 0) + 1
+print(counts)
+` },
+              { type: 'mcq', prompt: 'Which of these can be a dictionary key?',
+                options: ['<code>[1, 2]</code>', '<code>(1, 2)</code>', '<code>{"a": 1}</code>', '<code>{1, 2}</code>'], answer: 1,
+                explain: R`Keys must be hashable, which in practice means immutable. A tuple of immutable values qualifies; lists, dictionaries, and sets can change, so they cannot be keys.` },
+            ],
+          },
+          {
+            id: 'p3-3', title: 'Tuples and sets',
+            steps: [
+              { type: 'learn', title: 'Fixed records and unique items',
+                body: R`<p>A tuple is an immutable sequence, often used as a small record. Tuples unpack neatly into separate names, which is also how Python swaps two variables without a temporary.</p><p>A set holds unique items with no guaranteed order, and testing membership with <code>in</code> is fast.</p>`,
+                code: R`point = (3, 4)
+x, y = point
+x, y = y, x              # swap
+print(x, y)              # 4 3
+print(set([1, 1, 2]))    # {1, 2}` },
+              { type: 'code', prompt: 'Remove the duplicates from <code>ids</code> and print the unique values in ascending order as a list. Expected output: <code>[1, 2, 3]</code>',
+                starter: R`ids = [3, 1, 3, 2, 1]
+`,
+                expected: '[1, 2, 3]\n',
+                requires: [{ re: R`\bset\s*\(`, msg: 'Use set() to drop duplicates.' }],
+                hint: R`<code>sorted()</code> accepts a set and returns a list: <code>sorted(set(ids))</code>.`,
+                solution: R`ids = [3, 1, 3, 2, 1]
+print(sorted(set(ids)))
+` },
+              { type: 'mcq', prompt: 'What happens when you run <code>point = (3, 4)</code> and then <code>point[0] = 5</code>?',
+                options: ['<code>point</code> becomes <code>(5, 4)</code>', 'A <code>TypeError</code>, because tuples are immutable', 'A new tuple is created silently', 'Nothing happens'], answer: 1,
+                explain: R`Tuples cannot be changed after creation. To get <code>(5, 4)</code>, build a new tuple.` },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'Writing Python',
+        lessons: [
+          {
+            id: 'p4-1', title: 'Comprehensions',
+            steps: [
+              { type: 'learn', title: 'Building a list in one expression',
+                body: R`<p>A list comprehension builds a new list from an existing sequence: <code>[expression for item in sequence if condition]</code>. The condition is optional.</p><p>Use comprehensions for simple transformations. When the logic needs several lines, a regular loop reads better.</p>`,
+                code: R`nums = [1, 2, 3, 4, 5, 6]
+evens = [n for n in nums if n % 2 == 0]
+print(evens)                  # [2, 4, 6]
+print([n * 10 for n in evens])  # [20, 40, 60]` },
+              { type: 'mcq', prompt: 'What is <code>[c.upper() for c in "abc" if c != "b"]</code>?',
+                options: ['<code>["A", "B", "C"]</code>', '<code>["A", "C"]</code>', '<code>"AC"</code>', '<code>["a", "c"]</code>'], answer: 1,
+                explain: R`The condition drops <code>"b"</code>, and each remaining character is uppercased. The result is a list, not a string.` },
+              { type: 'code', prompt: 'Use a list comprehension to build the squares of 0 through 4, then print the list. Expected output: <code>[0, 1, 4, 9, 16]</code>',
+                starter: R`squares = []
+print(squares)
+`,
+                expected: '[0, 1, 4, 9, 16]\n',
+                requires: [{ re: R`\[[^\]]*\bfor\b[^\]]*\]`, msg: 'Use a list comprehension: [... for ... in ...].' }],
+                hint: R`<code>[i * i for i in range(5)]</code>`,
+                solution: R`squares = [i * i for i in range(5)]
+print(squares)
+` },
+            ],
+          },
+          {
+            id: 'p4-2', title: 'Names and references',
+            steps: [
+              { type: 'learn', title: 'Assignment never copies',
+                body: R`<p>Every Python variable is a reference to an object. <code>b = a</code> makes <code>b</code> refer to the same object as <code>a</code>; nothing is copied. If that object is mutable, such as a list, changes made through one name show up through the other.</p><p>If you know C, this is pointer aliasing without the stars. To get an independent list, copy it with <code>a.copy()</code> or <code>list(a)</code>.</p>`,
+                code: R`a = [1, 2, 3]
+b = a
+b.append(4)
+print(a)          # [1, 2, 3, 4]
+print(a is b)     # True: same object` },
+              { type: 'mcq', prompt: 'What does this print?', code: R`a = [1, 2, 3]
+b = a
+b = b + [4]
+print(a)`,
+                options: ['<code>[1, 2, 3, 4]</code>', '<code>[1, 2, 3]</code>', '<code>[4]</code>', 'An error'], answer: 1,
+                explain: R`<code>b + [4]</code> builds a new list, and the assignment points <code>b</code> at it. <code>a</code> still refers to the original. Compare with <code>b.append(4)</code>, which changes the shared list in place.` },
+              { type: 'code', prompt: 'Change the second line so that <code>b</code> is an independent copy, leaving <code>a</code> untouched. Expected output: <code>[1, 2, 3]</code> then <code>[1, 2, 3, 4]</code>, on separate lines.',
+                starter: R`a = [1, 2, 3]
+b = a
+b.append(4)
+print(a)
+print(b)
+`,
+                expected: '[1, 2, 3]\n[1, 2, 3, 4]\n',
+                hint: R`<code>b = a.copy()</code>`,
+                solution: R`a = [1, 2, 3]
+b = a.copy()
+b.append(4)
+print(a)
+print(b)
+` },
+            ],
+          },
+          {
+            id: 'p4-3', title: 'Exceptions',
+            steps: [
+              { type: 'learn', title: 'try and except',
+                body: R`<p>Errors in Python are exceptions. Wrap code that might fail in <code>try</code>, and handle specific exception types in <code>except</code> clauses. Catch the narrowest type you can; a bare <code>except:</code> also swallows bugs you would want to see.</p>`,
+                code: R`try:
+    value = int("42x")
+except ValueError:
+    value = 0
+print(value)   # 0` },
+              { type: 'code', prompt: 'Make <code>safe_div</code> return <code>None</code> when <code>b</code> is zero by catching <code>ZeroDivisionError</code>. Expected output: <code>5.0</code> then <code>None</code>, on separate lines.',
+                starter: R`def safe_div(a, b):
+    return a / b
+
+print(safe_div(10, 2))
+print(safe_div(1, 0))
+`,
+                expected: '5.0\nNone\n',
+                requires: [{ re: R`except\s+ZeroDivisionError`, msg: 'Catch ZeroDivisionError specifically.' }],
+                hint: R`Put <code>return a / b</code> inside <code>try:</code>, and <code>return None</code> under <code>except ZeroDivisionError:</code>.`,
+                solution: R`def safe_div(a, b):
+    try:
+        return a / b
+    except ZeroDivisionError:
+        return None
+
+print(safe_div(10, 2))
+print(safe_div(1, 0))
+` },
+              { type: 'mcq', prompt: 'Why is <code>except Exception:</code> around a large block usually a bad idea?',
+                options: ['It is slower', 'It also catches bugs such as typos, hiding them', 'It does not catch anything', 'It is a syntax error'], answer: 1,
+                explain: R`A misspelled name raises <code>NameError</code>, which a broad handler catches silently. The program keeps going with wrong results, and the real bug is harder to find.` },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'Classes',
+        lessons: [
+          {
+            id: 'p5-1', title: 'Defining a class',
+            steps: [
+              { type: 'learn', title: 'Data plus behavior',
+                body: R`<p>A class bundles data with functions that act on it. <code>__init__</code> runs when you create an instance and sets up its attributes. Every method receives the instance as its first parameter, named <code>self</code> by convention.</p><p>It is the struct from C with the functions attached: <code>t.boost()</code> is roughly <code>boost(&amp;t)</code>.</p>`,
+                code: R`class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def moved(self, dx):
+        return Point(self.x + dx, self.y)
+
+p = Point(1, 2).moved(5)
+print(p.x, p.y)   # 6 2` },
+              { type: 'code', prompt: 'Give <code>Thread</code> a <code>boost</code> method that adds 10 to its priority. Expected output: <code>41</code>',
+                starter: R`class Thread:
+    def __init__(self, tid, priority):
+        self.tid = tid
+        self.priority = priority
+
+    # add boost here
+
+t = Thread(1, 31)
+t.boost()
+print(t.priority)
+`,
+                expected: '41\n',
+                requires: [{ re: R`def\s+boost\s*\(\s*self`, msg: 'Define boost(self).' }],
+                hint: R`<code>def boost(self):</code> then <code>self.priority += 10</code>.`,
+                solution: R`class Thread:
+    def __init__(self, tid, priority):
+        self.tid = tid
+        self.priority = priority
+
+    def boost(self):
+        self.priority += 10
+
+t = Thread(1, 31)
+t.boost()
+print(t.priority)
+` },
+              { type: 'mcq', prompt: 'Inside a method, what happens if you write <code>priority += 10</code> instead of <code>self.priority += 10</code>?',
+                options: ['It updates the attribute anyway', 'An <code>UnboundLocalError</code>, because <code>priority</code> is treated as a local variable', 'It creates a class-wide variable', 'Nothing'], answer: 1,
+                explain: R`Without <code>self.</code>, Python looks for a local variable named <code>priority</code>. <code>+=</code> reads it before any assignment, so it fails.` },
+            ],
+          },
+          {
+            id: 'p5-2', title: 'Special methods',
+            steps: [
+              { type: 'learn', title: 'Hooking into built-in syntax',
+                body: R`<p>Methods with double underscores on both sides let your objects work with Python's built-in operations. <code>__len__</code> answers <code>len(obj)</code>, <code>__repr__</code> controls how the object prints, and <code>__eq__</code> defines <code>==</code>.</p>`,
+                code: R`class Bag:
+    def __init__(self):
+        self.items = []
+
+    def __len__(self):
+        return len(self.items)
+
+    def __repr__(self):
+        return f"Bag({self.items})"
+
+b = Bag()
+b.items.append("x")
+print(len(b), b)   # 1 Bag(['x'])` },
+              { type: 'code', prompt: 'Finish <code>Stack</code>: <code>push</code> adds to the top, <code>pop</code> removes and returns the top item, and <code>__len__</code> reports the size. Expected output: <code>3</code> then <code>2</code>, on separate lines.',
+                starter: R`class Stack:
+    def __init__(self):
+        self.items = []
+
+    def push(self, x):
+        pass
+
+    def pop(self):
+        pass
+
+    def __len__(self):
+        pass
+
+s = Stack()
+s.push(1)
+s.push(2)
+s.push(3)
+print(s.pop())
+print(len(s))
+`,
+                expected: '3\n2\n',
+                requires: [{ re: R`def\s+__len__`, msg: 'Keep the __len__ method.' }],
+                hint: R`<code>self.items.append(x)</code>, <code>return self.items.pop()</code>, and <code>return len(self.items)</code>.`,
+                solution: R`class Stack:
+    def __init__(self):
+        self.items = []
+
+    def push(self, x):
+        self.items.append(x)
+
+    def pop(self):
+        return self.items.pop()
+
+    def __len__(self):
+        return len(self.items)
+
+s = Stack()
+s.push(1)
+s.push(2)
+s.push(3)
+print(s.pop())
+print(len(s))
+` },
+              { type: 'mcq', prompt: 'Which special method does <code>print(obj)</code> use when a class defines <code>__repr__</code> but not <code>__str__</code>?',
+                options: ['None; it prints the memory address', '<code>__repr__</code>', '<code>__len__</code>', '<code>__init__</code>'], answer: 1,
+                explain: R`<code>print</code> calls <code>str()</code>, and the default <code>__str__</code> falls back to <code>__repr__</code>. Defining <code>__repr__</code> alone covers both.` },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+
+  lib: {
+    name: 'Python libraries',
+    tab: 'Libraries',
+    lang: 'py',
+    blurb: 'NumPy runs here for real. PyTorch and Keras cannot run in a browser, so those lessons pair real framework code with building the same mechanism in NumPy.',
+    units: [
+      {
+        title: 'NumPy basics',
+        lessons: [
+          {
+            id: 'n1-1', title: 'Arrays',
+            steps: [
+              { type: 'learn', title: 'One type, one block of memory',
+                body: R`<p>A NumPy array is closer to a C array than to a Python list: every element has the same type, and the data sits in one contiguous block. That is what makes it fast.</p><p>Every array has a <code>shape</code>, a tuple giving its size along each axis, and a <code>dtype</code>, its element type.</p>`,
+                code: R`import numpy as np
+
+a = np.array([1, 2, 3])
+print(a.shape, a.dtype)      # (3,) and an integer dtype, int64 on most 64-bit machines
+z = np.zeros((2, 3))
+print(z.shape)               # (2, 3)
+print(np.arange(5))          # [0 1 2 3 4]` },
+              { type: 'mcq', prompt: 'What is <code>np.zeros((3, 4)).shape</code>?',
+                options: ['<code>12</code>', '<code>(3, 4)</code>', '<code>(4, 3)</code>', '<code>[3, 4]</code>'], answer: 1,
+                explain: R`The shape is the tuple you passed in: 3 rows and 4 columns.` },
+              { type: 'code', prompt: 'Create an array of the integers 0 through 9 with <code>np.arange</code>, then print its shape and its sum. Expected output: <code>(10,) 45</code>',
+                starter: R`import numpy as np
+
+`,
+                expected: '(10,) 45\n',
+                requires: [{ re: R`np\.arange\s*\(`, msg: 'Create the array with np.arange.' }],
+                hint: R`<code>a = np.arange(10)</code>, then <code>print(a.shape, a.sum())</code>.`,
+                solution: R`import numpy as np
+
+a = np.arange(10)
+print(a.shape, a.sum())
+` },
+            ],
+          },
+          {
+            id: 'n1-2', title: 'Vectorized math',
+            steps: [
+              { type: 'learn', title: 'Operate on the whole array at once',
+                body: R`<p>Arithmetic on arrays applies element by element, and a scalar combines with every element. The loop still happens, but in compiled C code rather than in Python, which is typically tens to hundreds of times faster.</p>`,
+                code: R`import numpy as np
+
+a = np.array([1, 2, 3])
+print(a * 2)        # [2 4 6]
+print(a + a)        # [2 4 6]
+print(a ** 2)       # [1 4 9]` },
+              { type: 'mcq', prompt: 'What does <code>np.array([1, 2, 3]) * np.array([4, 5, 6])</code> give?',
+                options: ['<code>32</code>', '<code>[ 4 10 18]</code>', 'A 3 by 3 matrix', 'An error'], answer: 1,
+                explain: R`<code>*</code> multiplies element by element. The dot product, 32, is <code>a @ b</code> or <code>np.dot(a, b)</code>.` },
+              { type: 'code', prompt: 'Convert the Celsius readings to Fahrenheit with one vectorized expression, using integer math (<code>* 9 // 5 + 32</code>). Expected output: <code>[32 50 68]</code>',
+                starter: R`import numpy as np
+
+c = np.array([0, 10, 20])
+f = c   # replace with the conversion
+print(f)
+`,
+                expected: '[32 50 68]\n',
+                forbids: [{ re: R`\bfor\b`, msg: 'Do it without a loop.' }],
+                hint: R`<code>f = c * 9 // 5 + 32</code>`,
+                solution: R`import numpy as np
+
+c = np.array([0, 10, 20])
+f = c * 9 // 5 + 32
+print(f)
+` },
+            ],
+          },
+          {
+            id: 'n1-3', title: 'Indexing and masks',
+            steps: [
+              { type: 'learn', title: 'Slices are views; masks are filters',
+                body: R`<p>Slicing works like it does on lists, with one big difference: a NumPy slice is a view onto the same memory, not a copy. Writing through the slice changes the original array.</p><p>Comparing an array with a value gives a boolean array, and indexing with that boolean array keeps only the elements where it is <code>True</code>.</p>`,
+                code: R`import numpy as np
+
+a = np.arange(6)       # [0 1 2 3 4 5]
+print(a > 2)           # [False False False  True  True  True]
+print(a[a > 2])        # [3 4 5]
+s = a[:2]
+s[0] = 99
+print(a)               # [99  1  2  3  4  5]` },
+              { type: 'mcq', prompt: 'After <code>a = np.arange(4)</code>, <code>b = a[1:3]</code>, and <code>b[0] = 50</code>, what is <code>a</code>?',
+                options: ['<code>[0 1 2 3]</code>', '<code>[ 0 50  2  3]</code>', '<code>[50  1  2  3]</code>', 'An error'], answer: 1,
+                explain: R`<code>b</code> is a view of elements 1 and 2 of <code>a</code>. Setting <code>b[0]</code> writes to <code>a[1]</code>. Use <code>a[1:3].copy()</code> when you need independent data.` },
+              { type: 'code', prompt: 'Use a boolean mask to print only the even numbers in <code>a</code>. Expected output: <code>[0 2 4 6 8]</code>',
+                starter: R`import numpy as np
+
+a = np.arange(10)
+`,
+                expected: '[0 2 4 6 8]\n',
+                requires: [{ re: R`a\s*\[\s*a\s*%\s*2`, msg: 'Index a with a mask built from a % 2.' }],
+                hint: R`<code>print(a[a % 2 == 0])</code>`,
+                solution: R`import numpy as np
+
+a = np.arange(10)
+print(a[a % 2 == 0])
+` },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'NumPy for machine learning',
+        lessons: [
+          {
+            id: 'n2-1', title: 'Reshaping and axes',
+            steps: [
+              { type: 'learn', title: 'Which direction are you reducing?',
+                body: R`<p><code>reshape</code> reinterprets the same data with a new shape, as long as the total number of elements stays the same. Use <code>-1</code> for one dimension to let NumPy work it out.</p><p>Reductions such as <code>sum</code> and <code>mean</code> take an <code>axis</code>. The axis you name is the one that disappears: on a 2 by 3 array, <code>axis=0</code> collapses the rows and leaves 3 results, while <code>axis=1</code> collapses the columns and leaves 2.</p>`,
+                code: R`import numpy as np
+
+m = np.arange(6).reshape(2, 3)
+print(m)               # [[0 1 2]
+                       #  [3 4 5]]
+print(m.sum(axis=0))   # [3 5 7]
+print(m.sum(axis=1))   # [ 3 12]` },
+              { type: 'mcq', prompt: '<code>x</code> has shape <code>(32, 10)</code>: 32 samples with 10 features each. What is the shape of <code>x.mean(axis=0)</code>?',
+                options: ['<code>(32,)</code>', '<code>(10,)</code>', '<code>(32, 10)</code>', '<code>()</code>'], answer: 1,
+                explain: R`Axis 0, the samples axis, is collapsed, leaving one mean per feature. This is exactly what you compute when normalizing features.` },
+              { type: 'code', prompt: 'Reshape <code>np.arange(6)</code> into 2 rows and 3 columns, then print the sum of each row. Expected output: <code>[ 3 12]</code>',
+                starter: R`import numpy as np
+
+m = np.arange(6)
+`,
+                expected: '[ 3 12]\n',
+                requires: [{ re: R`reshape`, msg: 'Use reshape.' }, { re: R`axis\s*=\s*1`, msg: 'Sum along axis=1.' }],
+                hint: R`<code>m = np.arange(6).reshape(2, 3)</code>, then <code>print(m.sum(axis=1))</code>. NumPy pads numbers to line them up, so the space after the bracket is expected.`,
+                solution: R`import numpy as np
+
+m = np.arange(6).reshape(2, 3)
+print(m.sum(axis=1))
+` },
+            ],
+          },
+          {
+            id: 'n2-2', title: 'Broadcasting',
+            steps: [
+              { type: 'learn', title: 'Stretching shapes to match',
+                body: R`<p>When two arrays have different shapes, NumPy compares their shapes from the right. Two dimensions are compatible if they are equal or one of them is 1, and a dimension of size 1 is stretched to match the other. Missing leading dimensions count as 1.</p><p>So a <code>(3, 1)</code> column plus a <code>(3,)</code> row produces a <code>(3, 3)</code> grid. <code>keepdims=True</code> on a reduction keeps the collapsed axis at size 1, which makes the result broadcast back against the original.</p>`,
+                code: R`import numpy as np
+
+col = np.array([[0], [10], [20]])   # shape (3, 1)
+row = np.array([1, 2, 3])           # shape (3,)
+print(col + row)
+# [[ 1  2  3]
+#  [11 12 13]
+#  [21 22 23]]` },
+              { type: 'mcq', prompt: 'Which pair of shapes cannot be broadcast together?',
+                options: ['<code>(4, 3)</code> and <code>(3,)</code>', '<code>(4, 3)</code> and <code>(4,)</code>', '<code>(4, 1)</code> and <code>(1, 3)</code>', '<code>(4, 3)</code> and <code>(1, 3)</code>'], answer: 1,
+                explain: R`Comparing from the right, 3 and 4 are different and neither is 1. To add a per-row value to a <code>(4, 3)</code> array, give it shape <code>(4, 1)</code>.` },
+              { type: 'code', prompt: 'Subtract each row\'s minimum from that row, using <code>keepdims=True</code> so the shapes broadcast. Expected output: <code>[[0 1]</code> then <code> [0 1]]</code>, as NumPy prints a 2 by 2 array.',
+                starter: R`import numpy as np
+
+x = np.array([[1, 2], [3, 4]])
+`,
+                expected: '[[0 1]\n [0 1]]\n',
+                requires: [{ re: R`keepdims\s*=\s*True`, msg: 'Use keepdims=True.' }],
+                hint: R`<code>print(x - x.min(axis=1, keepdims=True))</code>`,
+                solution: R`import numpy as np
+
+x = np.array([[1, 2], [3, 4]])
+print(x - x.min(axis=1, keepdims=True))
+` },
+            ],
+          },
+          {
+            id: 'n2-3', title: 'A dense layer by hand',
+            steps: [
+              { type: 'learn', title: 'Matrix multiply, add, activate',
+                body: R`<p><code>@</code> is matrix multiplication. A fully connected layer, called <code>Linear</code> in PyTorch and <code>Dense</code> in Keras, computes <code>x @ W + b</code>: inputs times a weight matrix, plus a bias broadcast across every sample. An activation such as ReLU then zeroes out negative values.</p><p>For <code>x</code> of shape <code>(batch, inputs)</code>, <code>W</code> has shape <code>(inputs, outputs)</code> and <code>b</code> has shape <code>(outputs,)</code>.</p>`,
+                code: R`import numpy as np
+
+x = np.array([[1, 2]])            # 1 sample, 2 inputs
+W = np.array([[1, -1], [2, 0]])   # 2 inputs -> 2 outputs
+b = np.array([0, 1])
+print(x @ W + b)                  # [[ 5  0]]` },
+              { type: 'mcq', prompt: 'A batch <code>x</code> has shape <code>(64, 3)</code> and <code>W</code> has shape <code>(3, 8)</code>. What is the shape of <code>x @ W</code>?',
+                options: ['<code>(64, 3)</code>', '<code>(64, 8)</code>', '<code>(3, 8)</code>', '<code>(8, 64)</code>'], answer: 1,
+                explain: R`The inner dimensions (3 and 3) must match and disappear, leaving 64 samples with 8 outputs each.` },
+              { type: 'code', prompt: 'Compute the layer output <code>x @ W + b</code>, apply ReLU with <code>np.maximum(0, ...)</code>, and print it. Expected output: <code>[[5 4 0]]</code>',
+                starter: R`import numpy as np
+
+x = np.array([[1, 2, 3]])
+W = np.array([[1, 0, -1],
+              [0, 1, 0],
+              [1, 1, -1]])
+b = np.array([1, -1, 0])
+`,
+                expected: '[[5 4 0]]\n',
+                requires: [{ re: R`@`, msg: 'Use @ for the matrix multiply.' }, { re: R`np\.maximum`, msg: 'Apply ReLU with np.maximum.' }],
+                hint: R`<code>print(np.maximum(0, x @ W + b))</code>. Before ReLU, the values are 5, 4, and -4.`,
+                solution: R`import numpy as np
+
+x = np.array([[1, 2, 3]])
+W = np.array([[1, 0, -1],
+              [0, 1, 0],
+              [1, 1, -1]])
+b = np.array([1, -1, 0])
+print(np.maximum(0, x @ W + b))
+` },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'PyTorch',
+        lessons: [
+          {
+            id: 't1-1', title: 'Tensors',
+            steps: [
+              { type: 'learn', title: 'NumPy arrays that can live on a GPU',
+                body: R`<p>A PyTorch tensor behaves much like a NumPy array: it has a <code>shape</code>, a <code>dtype</code>, and supports the same broadcasting and <code>@</code>. It adds two things: it can live on a GPU, and it can record the operations applied to it so gradients can be computed.</p><p>Integer data becomes <code>torch.int64</code> and floating-point data becomes <code>torch.float32</code> by default. Neural network layers expect floats.</p>`,
+                code: R`import torch
+
+x = torch.tensor([[1.0, 2.0], [3.0, 4.0]])
+print(x.shape)            # torch.Size([2, 2])
+print(x.dtype)            # torch.float32
+y = x @ x.T + 1
+device = "cuda" if torch.cuda.is_available() else "cpu"
+x = x.to(device)          # move the data to the GPU if there is one
+a = x.cpu().numpy()       # back to NumPy` },
+              { type: 'mcq', prompt: 'What is the <code>dtype</code> of <code>torch.tensor([1, 2, 3])</code>?',
+                options: ['<code>torch.float32</code>', '<code>torch.int64</code>', '<code>torch.int32</code>', '<code>torch.float64</code>'], answer: 1,
+                explain: R`Python integers become <code>int64</code>. Feeding that to a layer whose weights are <code>float32</code> raises a dtype error, so write <code>1.0</code> or call <code>.float()</code>.` },
+              { type: 'mcq', prompt: '<code>x</code> is on the GPU and <code>w</code> is on the CPU. What happens with <code>x @ w</code>?',
+                options: ['PyTorch moves <code>w</code> automatically', 'A <code>RuntimeError</code> about tensors on different devices', 'The result lands on the CPU', 'It works but runs slowly'], answer: 1,
+                explain: R`Operands must be on the same device. Move the model and each batch with <code>.to(device)</code> before computing.` },
+            ],
+          },
+          {
+            id: 't1-2', title: 'Autograd and gradient descent',
+            steps: [
+              { type: 'learn', title: 'Gradients for free',
+                body: R`<p>Create a tensor with <code>requires_grad=True</code> and PyTorch records every operation that uses it. Calling <code>.backward()</code> on a scalar result computes the derivative with respect to each such tensor and stores it in <code>.grad</code>.</p><p>An optimizer then nudges each parameter against its gradient. Plain gradient descent is <code>w = w - lr * grad</code>, where <code>lr</code> is the learning rate.</p>`,
+                code: R`import torch
+
+w = torch.tensor(3.0, requires_grad=True)
+loss = (w - 5) ** 2
+loss.backward()
+print(w.grad)        # tensor(-4.)   since d/dw (w - 5)^2 = 2(w - 5)` },
+              { type: 'mcq', prompt: 'With <code>x = torch.tensor(3.0, requires_grad=True)</code> and <code>y = x ** 2</code>, what is <code>x.grad</code> after <code>y.backward()</code>?',
+                options: ['<code>tensor(9.)</code>', '<code>tensor(6.)</code>', '<code>tensor(3.)</code>', '<code>None</code>'], answer: 1,
+                explain: R`The derivative of x² is 2x, and 2 × 3 is 6.` },
+              { type: 'code', prompt: 'Do by hand what <code>optimizer.step()</code> does. Minimize <code>(w - 3) ** 2</code> starting from <code>w = 0.0</code>: the gradient is <code>2 * (w - 3)</code>, the learning rate is 0.25, and you take 3 steps. Print <code>w</code>. Expected output: <code>2.625</code>',
+                starter: R`w = 0.0
+lr = 0.25
+# take 3 gradient descent steps
+print(w)
+`,
+                expected: '2.625\n',
+                requires: [{ re: R`\bfor\b|\bwhile\b`, msg: 'Loop over the steps.' }],
+                hint: R`Inside <code>for _ in range(3):</code> compute <code>grad = 2 * (w - 3)</code>, then <code>w -= lr * grad</code>. The values go 0, 1.5, 2.25, 2.625.`,
+                solution: R`w = 0.0
+lr = 0.25
+for _ in range(3):
+    grad = 2 * (w - 3)
+    w -= lr * grad
+print(w)
+` },
+            ],
+          },
+          {
+            id: 't1-3', title: 'Modules and the training loop',
+            steps: [
+              { type: 'learn', title: 'nn.Module and the five-line loop',
+                body: R`<p>A model is a subclass of <code>nn.Module</code>. You create its layers in <code>__init__</code> and describe how data flows through them in <code>forward</code>. Calling <code>model(x)</code> runs <code>forward</code>.</p><p>PyTorch leaves the training loop to you. Every step has the same shape: clear old gradients, run the model, compute the loss, backpropagate, and update.</p>`,
+                code: R`import torch
+from torch import nn
+
+class Net(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.hidden = nn.Linear(4, 8)
+        self.out = nn.Linear(8, 1)
+
+    def forward(self, x):
+        return self.out(torch.relu(self.hidden(x)))
+
+model = Net()
+opt = torch.optim.SGD(model.parameters(), lr=0.01)
+loss_fn = nn.MSELoss()
+
+for x, y in loader:           # batches from a DataLoader
+    opt.zero_grad()           # 1. clear old gradients
+    pred = model(x)           # 2. forward pass
+    loss = loss_fn(pred, y)   # 3. loss
+    loss.backward()           # 4. compute gradients
+    opt.step()                # 5. update weights` },
+              { type: 'mcq', prompt: 'What goes wrong if you leave out <code>opt.zero_grad()</code>?',
+                options: ['Nothing; gradients reset automatically', 'Gradients from every batch add up, so the updates grow wrong', 'The loss stops being computed', 'The model resets its weights each step'], answer: 1,
+                explain: R`<code>.backward()</code> adds to <code>.grad</code> rather than overwriting it. Without clearing, each step uses the sum of all previous gradients.` },
+              { type: 'mcq', prompt: 'How many trainable parameters does <code>nn.Linear(4, 8)</code> have?',
+                options: ['<code>32</code>', '<code>40</code>', '<code>12</code>', '<code>36</code>'], answer: 1,
+                explain: R`A 4 by 8 weight matrix is 32 parameters, and the bias adds one per output, 8 more, for 40.` },
+              { type: 'mcq', prompt: 'Why wrap evaluation code in <code>with torch.no_grad():</code>?',
+                options: ['It makes the model more accurate', 'It skips recording operations for autograd, saving memory and time', 'It is required for the model to run', 'It freezes the weights permanently'], answer: 1,
+                explain: R`During evaluation you never call <code>.backward()</code>, so recording the computation graph is wasted work. Also call <code>model.eval()</code> so layers such as dropout behave correctly.` },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'Keras',
+        lessons: [
+          {
+            id: 'k1-1', title: 'Sequential models',
+            steps: [
+              { type: 'learn', title: 'Stacking layers',
+                body: R`<p>Keras describes a model as a stack of layers. <code>keras.Sequential</code> takes a list of them, and each <code>Dense</code> layer is the <code>x @ W + b</code> you built in NumPy, with an optional activation.</p><p>Since Keras 3, the same model code runs on TensorFlow, JAX, or PyTorch as the backend.</p>`,
+                code: R`import keras
+from keras import layers
+
+model = keras.Sequential([
+    keras.Input(shape=(4,)),
+    layers.Dense(8, activation="relu"),
+    layers.Dense(1),
+])
+model.summary()   # prints each layer's output shape and parameter count` },
+              { type: 'mcq', prompt: 'In the model above, how many parameters does <code>Dense(8)</code> have?',
+                options: ['<code>32</code>', '<code>40</code>', '<code>8</code>', '<code>12</code>'], answer: 1,
+                explain: R`It receives 4 inputs: a 4 by 8 weight matrix (32) plus 8 biases, for 40. The same count as PyTorch's <code>nn.Linear(4, 8)</code>.` },
+              { type: 'code', prompt: 'Write <code>param_count(sizes)</code> that returns the total parameters of a stack of dense layers, where <code>sizes</code> lists the input size followed by each layer\'s output size. Expected output: <code>49</code>',
+                starter: R`def param_count(sizes):
+    total = 0
+    # each layer maps sizes[i] inputs to sizes[i + 1] outputs
+    return total
+
+print(param_count([4, 8, 1]))
+`,
+                expected: '49\n',
+                requires: [{ re: R`\bfor\b|\bwhile\b`, msg: 'Loop over consecutive pairs of sizes.' }],
+                hint: R`For each pair, add <code>n_in * n_out + n_out</code>. <code>zip(sizes, sizes[1:])</code> gives the pairs.`,
+                solution: R`def param_count(sizes):
+    total = 0
+    for n_in, n_out in zip(sizes, sizes[1:]):
+        total += n_in * n_out + n_out
+    return total
+
+print(param_count([4, 8, 1]))
+` },
+            ],
+          },
+          {
+            id: 'k1-2', title: 'compile, fit, evaluate',
+            steps: [
+              { type: 'learn', title: 'The loop is written for you',
+                body: R`<p>Where PyTorch has you write the training loop, Keras packages it. <code>compile</code> chooses the optimizer, the loss, and any metrics to report. <code>fit</code> runs the loop over your data for a number of epochs, and <code>evaluate</code> and <code>predict</code> use the trained model.</p><p>One epoch is one full pass over the training data, processed in batches of <code>batch_size</code> samples.</p>`,
+                code: R`model.compile(optimizer="adam",
+              loss="binary_crossentropy",
+              metrics=["accuracy"])
+
+history = model.fit(x_train, y_train,
+                    epochs=10, batch_size=32,
+                    validation_split=0.2)
+
+loss, acc = model.evaluate(x_test, y_test)
+probs = model.predict(x_new)` },
+              { type: 'mcq', prompt: 'You train on 1,000 samples with <code>batch_size=32</code>. How many batches make up one epoch?',
+                options: ['<code>31</code>', '<code>32</code>', '<code>1000</code>', '<code>10</code>'], answer: 1,
+                explain: R`1000 / 32 is 31.25, so there are 31 full batches plus one final batch of 8 samples: 32 batches in total.` },
+              { type: 'mcq', prompt: 'Your model outputs one sigmoid probability for a yes-or-no label. Which loss fits?',
+                options: ['<code>mean_squared_error</code>', '<code>binary_crossentropy</code>', '<code>categorical_crossentropy</code>', '<code>hinge</code>'], answer: 1,
+                explain: R`Binary cross-entropy measures how well a single probability matches a 0 or 1 label. Categorical cross-entropy is for choosing one of several classes, and mean squared error is for predicting real numbers.` },
+              { type: 'mcq', prompt: 'Training accuracy keeps rising while validation accuracy falls. What is happening?',
+                options: ['The learning rate is too low', 'The model is overfitting: memorizing the training data instead of generalizing', 'The batch size is too large', 'The data is too clean'], answer: 1,
+                explain: R`The model keeps improving on examples it has seen and gets worse on examples it has not. Common responses are stopping earlier, adding regularization such as dropout, or collecting more data.` },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+};
+Object.assign(TRACKS, PY_TRACKS);
+
 
 </script>
 <script>
@@ -1174,7 +2055,7 @@ if (typeof module !== 'undefined') module.exports = { TRACKS };
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
   let state = load();
-  state.track = 'c';
+  if (!TRACKS[state.track]) state.track = 'c';
 
   const $ = (s, r = document) => r.querySelector(s);
   const el = (tag, attrs = {}, kids = []) => {
@@ -1203,6 +2084,13 @@ if (typeof module !== 'undefined') module.exports = { TRACKS };
   function dayStr(d) { return d.toLocaleDateString('en-CA'); }
 
   /* ---------------- header ---------------- */
+  function renderTabs() {
+    const box = $('#tracks'); box.innerHTML = '';
+    Object.entries(TRACKS).forEach(([key, t]) => box.append(el('button', {
+      type: 'button', 'aria-pressed': String(key === state.track), text: t.tab,
+      onclick: () => { if (state.track !== key) { state.track = key; save(); renderAll(true); } },
+    })));
+  }
   function renderStats() {
     const ls = allLessons(state.track);
     $('#st-xp').textContent = state.xp;
@@ -1302,7 +2190,7 @@ if (typeof module !== 'undefined') module.exports = { TRACKS };
       window.scrollTo(0, Math.max(0, target));
     }
   }
-  function renderAll(scroll) { renderStats(); renderStack(scroll); }
+  function renderAll(scroll) { renderTabs(); renderStats(); renderStack(scroll); }
   let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => renderStack(false), 120); });
 
   $('#reset').addEventListener('click', () => {
@@ -1400,7 +2288,97 @@ self.postMessage({ ready: true });`;
       }
       return { unavailable: true };
     }
-    return { run, warm: ensure };
+    return { run, warm: ensure, limit: 5 };
+  })();
+
+  /* ---------------- Python runner (Pyodide) ---------------- */
+  const PyRun = (function () {
+    const INDEX = 'https://cdn.jsdelivr.net/pyodide/v0.29.5/full/';
+    const HARNESS = "import sys, io, traceback, builtins, linecache\n\ndef __run(src):\n    buf = io.StringIO()\n    saved = (sys.stdout, sys.stderr)\n    sys.stdout = sys.stderr = buf\n    failed = False\n    linecache.cache[\"main.py\"] = (len(src), None, src.splitlines(True), \"main.py\")\n\n    def _no_input(*args):\n        raise RuntimeError(\"input() is not available here. Set the value in your code instead.\")\n\n    scope = {\"__name__\": \"__main__\", \"__builtins__\": builtins, \"input\": _no_input}\n    try:\n        exec(compile(src, \"main.py\", \"exec\"), scope)\n    except SystemExit:\n        pass\n    except BaseException as exc:\n        failed = True\n        frames = [f for f in traceback.extract_tb(exc.__traceback__) if f.filename == \"main.py\"]\n        if frames:\n            buf.write(\"Traceback (most recent call last):\\n\")\n            buf.write(\"\".join(traceback.format_list(frames)))\n        buf.write(\"\".join(traceback.format_exception_only(type(exc), exc)))\n    finally:\n        sys.stdout, sys.stderr = saved\n    return [buf.getvalue(), failed]\n";
+    let worker = null, mode = null, seq = 0, mainPy = null;
+    const WSRC = [
+      'importScripts(' + JSON.stringify(INDEX + 'pyodide.js') + ');',
+      'var HARNESS = ' + JSON.stringify(HARNESS) + ';',
+      'var pyP = null, ready = false;',
+      'function boot() { if (!pyP) { pyP = loadPyodide({ indexURL: ' + JSON.stringify(INDEX) + ' }).then(function (py) { py.runPython(HARNESS); ready = true; return py; }); } return pyP; }',
+      'self.onmessage = async function (e) {',
+      '  var d = e.data;',
+      '  try {',
+      '    if (!ready) self.postMessage({ id: d.id, phase: "loading", msg: "Starting Python. The first run downloads about 10 MB." });',
+      '    var py = await boot();',
+      '    if (/\\b(import|from)\\b/.test(d.code)) {',
+      '      self.postMessage({ id: d.id, phase: "loading", msg: "Loading packages..." });',
+      '      await py.loadPackagesFromImports(d.code, { messageCallback: function () {}, errorCallback: function () {} });',
+      '    }',
+      '    self.postMessage({ id: d.id, phase: "running" });',
+      '    var fn = py.globals.get("__run"); var res = fn(d.code); var v = res.toJs(); res.destroy(); fn.destroy();',
+      '    self.postMessage({ id: d.id, out: v[0], error: v[1] });',
+      '  } catch (err) { self.postMessage({ id: d.id, fatal: String((err && err.message) || err) }); }',
+      '};',
+      'self.postMessage({ ready: true });',
+    ].join('\n');
+    function spawn() {
+      return new Promise((resolve, reject) => {
+        let w;
+        try { w = new Worker(URL.createObjectURL(new Blob([WSRC], { type: 'text/javascript' }))); }
+        catch (e) { reject(e); return; }
+        const to = setTimeout(() => { w.terminate(); reject(new Error('worker start timeout')); }, 30000);
+        w.onmessage = e => { if (e.data && e.data.ready) { clearTimeout(to); resolve(w); } };
+        w.onerror = e => { clearTimeout(to); w.terminate(); reject(e); };
+      });
+    }
+    async function ensure() {
+      if (mode === 'worker' && worker) return;
+      if (mode === 'main' || mode === 'none') return;
+      try { worker = await spawn(); mode = 'worker'; }
+      catch (e) { worker = null; mode = 'main'; }
+    }
+    function viaWorker(code, onPhase) {
+      return new Promise(resolve => {
+        const id = ++seq, w = worker;
+        let runTimer = null;
+        const kill = res => { clearTimeout(runTimer); clearTimeout(loadTimer); w.terminate(); worker = null; mode = null; resolve(res); };
+        const loadTimer = setTimeout(() => kill({ fatal: 'Python took too long to download. Check your connection and try again.' }), 120000);
+        w.onmessage = e => {
+          const d = e.data;
+          if (!d || d.id !== id) return;
+          if (d.phase === 'loading') { onPhase(d.msg); return; }
+          if (d.phase === 'running') { clearTimeout(loadTimer); onPhase('Running...'); runTimer = setTimeout(() => kill({ timeout: true }), 8000); return; }
+          clearTimeout(runTimer); clearTimeout(loadTimer); resolve(d);
+        };
+        w.onerror = () => kill({ fatal: 'The Python worker crashed.' });
+        w.postMessage({ id, code });
+      });
+    }
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const tag = document.createElement('script');
+        tag.src = src; tag.onload = resolve; tag.onerror = () => reject(new Error('Could not download ' + src));
+        document.head.append(tag);
+      });
+    }
+    async function viaMain(code, onPhase) {
+      try {
+        if (!mainPy) {
+          onPhase('Starting Python. The first run downloads about 10 MB.');
+          mainPy = loadScript(INDEX + 'pyodide.js').then(() => loadPyodide({ indexURL: INDEX })).then(py => { py.runPython(HARNESS); return py; });
+        }
+        const py = await mainPy;
+        if (/\b(import|from)\b/.test(code)) { onPhase('Loading packages...'); await py.loadPackagesFromImports(code, { messageCallback() {}, errorCallback() {} }); }
+        const fn = py.globals.get('__run'); const res = fn(code); const v = res.toJs(); res.destroy(); fn.destroy();
+        return { out: v[0], error: v[1] };
+      } catch (err) { mainPy = null; return { fatal: String((err && err.message) || err) }; }
+    }
+    async function run(code, onPhase = () => {}) {
+      await ensure();
+      let r;
+      if (mode === 'worker') r = await viaWorker(code, onPhase);
+      else r = await viaMain(code, onPhase);
+      if (r.fatal) return { unavailable: true, why: r.fatal };
+      if (r.timeout) return r;
+      return { out: r.out, error: !!r.error, exit: r.error ? 1 : 0 };
+    }
+    return { run, warm: () => ensure(), limit: 8 };
   })();
 
   /* ---------------- helpers for checking ---------------- */
@@ -1415,7 +2393,7 @@ self.postMessage({ ready: true });`;
     Object.assign(P, { lesson, i: 0, xp: 0, firstTry: 0, graded: 0 });
     player.classList.add('open');
     document.body.style.overflow = 'hidden';
-    CRun.warm();
+    (TRACKS[state.track].lang === 'py' ? PyRun : CRun).warm();
     renderStep();
   }
   function closePlayer() {
@@ -1519,7 +2497,7 @@ self.postMessage({ ready: true });`;
         ta.selectionStart = ta.selectionEnd = a + 4; sync();
       } else if (e.key === 'Enter' && !e.metaKey && !e.ctrlKey) {
         const a = ta.selectionStart; const line = ta.value.slice(0, a).split('\n').pop();
-        const ind = (line.match(/^\s*/) || [''])[0] + (/\{\s*$/.test(line) ? '    ' : '');
+        const ind = (line.match(/^\s*/) || [''])[0] + (/[{:]\s*$/.test(line) ? '    ' : '');
         e.preventDefault();
         ta.value = ta.value.slice(0, a) + '\n' + ind + ta.value.slice(ta.selectionEnd);
         ta.selectionStart = ta.selectionEnd = a + 1 + ind.length; sync();
@@ -1534,10 +2512,12 @@ self.postMessage({ ready: true });`;
   }
 
   function stepCode(s) {
+    const isPy = TRACKS[state.track].lang === 'py';
+    const runner = isPy ? PyRun : CRun;
     heading(P.lesson.title, 'Write the code');
     inner.append(el('p', { class: 'prompt', html: s.prompt }));
     const term = el('div', { class: 'term' }, [el('div', { class: 'term-h' }, [el('span', { text: 'stdout' }), el('span', { class: 'status', text: '' })]), el('pre', { class: 'muted', text: 'Press Run to execute, or Check when you think it is right.' })]);
-    const E = makeEditor(s.starter, 'main.c', () => doRun(false));
+    const E = makeEditor(s.starter, isPy ? 'main.py' : 'main.c', () => doRun(false));
     inner.append(E.ed);
     const tools = el('div', { class: 'tools' });
     const hintBtn = el('button', { type: 'button', class: 'btn small', html: icon('bulb') + '<span>Hint</span>', onclick: () => { if (!$('.hint', inner)) tools.after(el('div', { class: 'hint', html: s.hint })); hintBtn.disabled = true; } });
@@ -1552,27 +2532,30 @@ self.postMessage({ ready: true });`;
       const pre = term.querySelector('pre'), status = term.querySelector('.status');
       E.runBtn.disabled = true; mainBtn.disabled = true;
       pre.className = 'muted'; pre.textContent = ''; status.textContent = 'running';
-      const skel = el('div', { class: 'skel', 'aria-label': 'Running' }, [el('i'), el('i'), el('i')]);
+      const skelMsg = el('span', { class: 'skel-msg', text: '' });
+      const skel = el('div', { class: 'skel', 'aria-label': 'Running' }, [el('i'), el('i'), el('i'), skelMsg]);
       pre.hidden = true; pre.after(skel);
-      const r = await CRun.run(E.ta.value);
+      const r = await runner.run(E.ta.value, msg => { skelMsg.textContent = msg; });
       skel.remove(); pre.hidden = false;
       E.runBtn.disabled = false; mainBtn.disabled = false;
       if (r.unavailable) {
         pre.className = 'err';
-        pre.textContent = 'The C runner could not start in this browser' + (r.why ? ' (' + r.why + ')' : '') + '. Compare your code with the solution, or try another browser.';
+        pre.textContent = 'The ' + (isPy ? 'Python' : 'C') + ' runner could not start' + (r.why ? ' (' + r.why + ')' : '') + '. Compare your code with the solution, or try again later.';
         if (grading) { solBtn.hidden = false; setFoot('warn', 'Runner unavailable', 'You can reveal the solution and mark this step done yourself.'); setMain('Mark done', () => { award(false); next(); }); }
         return;
       }
       if (r.timeout) {
-        pre.className = 'warn'; pre.textContent = 'Stopped after 5 seconds. Is there a loop that never ends?'; status.textContent = 'timeout';
-        if (grading) fail('It never finished', 'Your program ran for more than 5 seconds. Check your loop condition.', 'warn');
+        pre.className = 'warn'; pre.textContent = 'Stopped after ' + runner.limit + ' seconds. Is there a loop that never ends?'; status.textContent = 'timeout';
+        if (grading) fail('It never finished', 'Your program ran for more than ' + runner.limit + ' seconds. Check your loop condition.', 'warn');
         return;
       }
       pre.className = r.error ? 'err' : '';
       pre.textContent = r.out === '' ? '(no output)' : r.out;
       status.textContent = 'exit ' + (r.exit == null ? 0 : r.exit);
       if (!grading) return;
-      if (r.error) return fail('Your program stopped with an error', 'Read the message in the output panel. The line and column point at the problem.');
+      if (r.error) return isPy
+        ? fail('Your program raised an exception', 'Read the traceback in the output panel. The last line names the error, and the line above it shows where it happened.')
+        : fail('Your program stopped with an error', 'Read the message in the output panel. The line and column point at the problem.');
       const got = normOut(r.out), want = normOut(s.expected);
       if (got !== want) {
         return fail('The output does not match yet',
